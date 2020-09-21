@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "851100660739",
+    "firebase_url": "https://app-boi-dich.firebaseio.com",
+    "project_id": "app-boi-dich",
+    "storage_bucket": "app-boi-dich.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851100660739:android:72515a10ec0278a0d08a36",
+        "android_client_info": {
+          "package_name": "com.cannshine.Fortune"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "851100660739-j3ksssbvcvv1tvt00mepiejh7gp9pv98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeMl3sjStZpZCmBfAwI7XJK8vBA2APQ2s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "851100660739-j3ksssbvcvv1tvt00mepiejh7gp9pv98.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "851100660739-ioacnmue2n5umprdsdn74kh7a8do8soq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cannshine.Fortune",
+                "app_store_id": "910483222"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

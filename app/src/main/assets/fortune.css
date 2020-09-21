@@ -1,0 +1,32 @@
+.fortune {
+    margin: 5px 5px;
+    font-family: 'Segoe UI', proxima-nova, Helvetica-neue, helvetica, sans-serif !important;
+    font-weight: initial !important;
+    font-size: 50px !important;
+    letter-spacing: initial !important;
+    line-height: 50px !important;
+    color: black !important;
+    text-align:justify;
+}
+
+.title{
+    margin: 5px 5px;
+    font-family: 'UTM Azuki' !important;
+    font-weight: bold !important;
+    font-size: 50px !important;
+    letter-spacing: initial !important;
+    line-height: 60px !important;
+    color: black !important;
+    text-align:center;
+}
+
+.sumup{
+    margin: 5px 5px;
+    font-family: 'Segoe UI', proxima-nova, Helvetica-neue, helvetica, sans-serif !important;
+    font-weight: initial !important;
+    font-size: 50px !important;
+    letter-spacing: initial !important;
+    line-height: 50px !important;
+    color: black !important;
+    text-align:center;
+}

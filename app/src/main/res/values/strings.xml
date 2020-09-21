@@ -1,0 +1,12 @@
+<resources>
+    <!--admob-->
+    <string name="app_name">Bói dịch</string>
+    <string name="app_id">ca-app-pub-4323946168772137~1994522201</string>
+    <string name="full_screen">ca-app-pub-4323946168772137/4947988608</string>
+    <string name="banner">ca-app-pub-4323946168772137/3471255408</string>
+
+    <!--startapp-->
+    <string name="account_id_startapp">108813858 </string>
+    <string name="app_id_startapp">208784454</string>
+
+</resources>
