@@ -1,0 +1,2 @@
+# FortuneApp
+Bói Dịch
