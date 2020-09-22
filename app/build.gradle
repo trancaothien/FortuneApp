@@ -25,7 +25,11 @@ android {
         }
     }
     repositories {
+        google()
         jcenter()
+    }
+    dataBinding {
+        dataBinding.enabled = true
     }
 }
 
@@ -44,6 +48,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.2.3'
     implementation "androidx.core:core-ktx:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
 }
 repositories {
     mavenCentral()

@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.renderscript.ScriptGroup
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -22,6 +23,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -32,11 +35,13 @@ import com.cannshine.Fortune.db.Database
 import com.cannshine.Fortune.BuildConfig
 import com.cannshine.Fortune.R
 import com.cannshine.Fortune.VolleyRequest.ApplicationController
+import com.cannshine.Fortune.databinding.ActivityMainMenuBinding
 import com.cannshine.Fortune.model.AdsManager
 import com.cannshine.Fortune.model.Hexegram
 import com.cannshine.Fortune.utils.CheckInternet
 import com.cannshine.Fortune.utils.Global
 import com.cannshine.Fortune.utils.Utils
+import com.cannshine.Fortune.viewModel.MainMenuViewModel
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -96,9 +101,13 @@ class MainMenuActivity : AppCompatActivity() {
     var dataHexegram = Database(this)
     var arrayList = ArrayList<Int>()
     var broadcastReceiver: BroadcastReceiver? = null
+    lateinit var viewModel : MainMenuViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main_menu)
+        //setContentView(R.layout.activity_main_menu)
+        val binding: ActivityMainMenuBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_menu)
+        viewModel = MainMenuViewModel()
+        viewModel.init(this)
 
         // Admob Banner
         if (CheckInternet.isConnected(this)) {
@@ -452,34 +461,34 @@ class MainMenuActivity : AppCompatActivity() {
 
         //return IDHexegram
     }
-
-    fun setTitle() {
-        val idDaoNguoc = reverseID(iDHexegram)
-        val flagHD = reverseID(flag)
-        var kyTu: String
-        var flag: String
-        for (i in 0 until idDaoNguoc.length) {
-            flag = flagHD[i].toString()
-            kyTu = idDaoNguoc[i].toString()
-            if (flag == "1") {
-                kyTu = if (kyTu == "0") {
-                    "1"
-                } else {
-                    "0"
-                }
-            }
-            idHexe = idHexe + kyTu
-        }
-        data = dataHexegram.getValues(idHexe)
-        val name = data.h_name
-        txvTitle!!.textSize = 15f
-        txvTitle!!.text = name
-    }
-
-    //dao nguoc chuoi
-    fun reverseID(id: String?): String {
-        return StringBuffer(id!!).reverse().toString()
-    }
+    //todo: mvvm
+//    fun setTitle() {
+//        val idDaoNguoc = reverseID(iDHexegram)
+//        val flagHD = reverseID(flag)
+//        var kyTu: String
+//        var flag: String
+//        for (i in 0 until idDaoNguoc.length) {
+//            flag = flagHD[i].toString()
+//            kyTu = idDaoNguoc[i].toString()
+//            if (flag == "1") {
+//                kyTu = if (kyTu == "0") {
+//                    "1"
+//                } else {
+//                    "0"
+//                }
+//            }
+//            idHexe = idHexe + kyTu
+//        }
+//        data = dataHexegram.getValues(idHexe)!!
+//        val name = data.h_name
+//        txvTitle!!.textSize = 15f
+//        txvTitle!!.text = name
+//    }
+//
+//    //dao nguoc chuoi
+//    fun reverseID(id: String?): String {
+//        return StringBuffer(id!!).reverse().toString()
+//    }
 
     fun buttomShare() {
         btnShare!!.setOnClickListener {
@@ -682,7 +691,8 @@ class MainMenuActivity : AppCompatActivity() {
                 }
                 setLine(count - 1)
                 if (count == 7) {
-                    setTitle()
+                    //todo: mvvm
+                    viewModel.setTitle(flag)
                 }
             }
 

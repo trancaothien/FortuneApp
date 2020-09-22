@@ -130,7 +130,7 @@ class DetailActivity : AppCompatActivity() {
 
         //setLine
         setLineHexegram(h1, h2, h3, h4, h5, h6)
-        hexegram = data.getValues(idHexegram)
+        hexegram = data.getValues(idHexegram)!!
         val title = hexegram.h_name
         txvTitle!!.textSize = 15f
         txvTitle!!.text = title

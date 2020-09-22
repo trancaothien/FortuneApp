@@ -63,7 +63,7 @@ class Database(private val mContext: Context) : SQLiteOpenHelper(mContext, DB_NA
         super.close()
     }
 
-    fun getValues(idHexegram: String): Hexegram {
+    fun getValues(idHexegram: String): Hexegram? {
         val dataxam = Hexegram()
         val query = "SELECT * FROM ft_hexagram where h_ID ='$idHexegram'"
         db = this.writableDatabase
