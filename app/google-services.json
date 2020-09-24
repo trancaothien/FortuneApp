@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:851100660739:android:72515a10ec0278a0d08a36",
         "android_client_info": {
-          "package_name": "com.cannshine.Fortune"
+          "package_name": "com.cannshine.fortune"
         }
       },
       "oauth_client": [
@@ -35,7 +35,7 @@
               "client_id": "851100660739-ioacnmue2n5umprdsdn74kh7a8do8soq.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.cannshine.Fortune",
+                "bundle_id": "com.cannshine.fortune",
                 "app_store_id": "910483222"
               }
             }

@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.model
+package com.cannshine.fortune.model
 
 import android.content.Context
 import com.google.android.gms.ads.AdRequest

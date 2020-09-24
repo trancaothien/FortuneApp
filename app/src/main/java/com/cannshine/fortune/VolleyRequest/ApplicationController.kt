@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.VolleyRequest
+package com.cannshine.fortune.VolleyRequest
 
 import android.content.Context
 import android.graphics.Bitmap

@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.view.activities
+package com.cannshine.fortune.detail
 
 import android.app.Dialog
 import android.content.BroadcastReceiver
@@ -23,16 +23,17 @@ import com.android.volley.Response
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.NetworkImageView
 import com.android.volley.toolbox.StringRequest
-import com.cannshine.Fortune.db.Database
-import com.cannshine.Fortune.view.customView.InteractiveScrollView.OnBottomReachedListener
-import com.cannshine.Fortune.R
-import com.cannshine.Fortune.VolleyRequest.ApplicationController
-import com.cannshine.Fortune.model.AdsManager
-import com.cannshine.Fortune.model.Hexegram
-import com.cannshine.Fortune.utils.CheckInternet
-import com.cannshine.Fortune.utils.Global
-import com.cannshine.Fortune.utils.Utils
-import com.cannshine.Fortune.view.customView.InteractiveScrollView
+import com.cannshine.fortune.db.Database
+import com.cannshine.fortune.customView.InteractiveScrollView.OnBottomReachedListener
+import com.cannshine.fortune.R
+import com.cannshine.fortune.VolleyRequest.ApplicationController
+import com.cannshine.fortune.mainmenu.MainMenuActivity
+import com.cannshine.fortune.model.AdsManager
+import com.cannshine.fortune.model.Hexegram
+import com.cannshine.fortune.utils.CheckInternet
+import com.cannshine.fortune.utils.Global
+import com.cannshine.fortune.utils.Utils
+import com.cannshine.fortune.customView.InteractiveScrollView
 import com.google.android.gms.ads.*
 import com.startapp.android.publish.adsCommon.StartAppAd
 import org.json.JSONException

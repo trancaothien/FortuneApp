@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.view.customView
+package com.cannshine.fortune.customView
 
 import android.content.Context
 import android.util.AttributeSet

@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.utils
+package com.cannshine.fortune.utils
 
 class Global {
     companion object{

@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.model
+package com.cannshine.fortune.model
 
 class Hexegram {
     var h_ID: String? = null

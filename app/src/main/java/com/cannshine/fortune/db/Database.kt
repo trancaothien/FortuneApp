@@ -1,9 +1,9 @@
-package com.cannshine.Fortune.db
+package com.cannshine.fortune.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.cannshine.Fortune.model.Hexegram
+import com.cannshine.fortune.model.Hexegram
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
@@ -85,7 +85,7 @@ class Database(private val mContext: Context) : SQLiteOpenHelper(mContext, DB_NA
     }
 
     companion object {
-        var DB_PATH = "data/data/com.cannshine.Fortune/databases/"
+        var DB_PATH = "data/data/com.cannshine.fortune/databases/"
         var DB_NAME = "FortuneDB.sqlite"
     }
 }

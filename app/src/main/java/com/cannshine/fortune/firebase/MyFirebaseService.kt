@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.Firebase
+package com.cannshine.fortune.firebase
 
 import android.app.ActivityManager
 import android.app.NotificationManager
@@ -12,11 +12,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
-import com.cannshine.Fortune.view.activities.SplashActivity
-import com.cannshine.Fortune.utils.Global
-import com.cannshine.Fortune.utils.Utils
-import com.cannshine.Fortune.R
-import com.cannshine.Fortune.VolleyRequest.ApplicationController
+import com.cannshine.fortune.splash.SplashActivity
+import com.cannshine.fortune.utils.Global
+import com.cannshine.fortune.utils.Utils
+import com.cannshine.fortune.R
+import com.cannshine.fortune.VolleyRequest.ApplicationController
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import org.json.JSONException

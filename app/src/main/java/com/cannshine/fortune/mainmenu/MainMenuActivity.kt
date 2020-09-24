@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.view.activities
+package com.cannshine.fortune.mainmenu
 
 import android.Manifest
 import android.app.Dialog
@@ -11,7 +11,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.renderscript.ScriptGroup
 import android.util.Log
 import android.view.View
 import android.view.animation.Animation
@@ -21,27 +20,25 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.NetworkImageView
 import com.android.volley.toolbox.StringRequest
-import com.cannshine.Fortune.db.Database
-import com.cannshine.Fortune.BuildConfig
-import com.cannshine.Fortune.R
-import com.cannshine.Fortune.VolleyRequest.ApplicationController
-import com.cannshine.Fortune.databinding.ActivityMainMenuBinding
-import com.cannshine.Fortune.model.AdsManager
-import com.cannshine.Fortune.model.Hexegram
-import com.cannshine.Fortune.utils.CheckInternet
-import com.cannshine.Fortune.utils.Global
-import com.cannshine.Fortune.utils.Utils
-import com.cannshine.Fortune.viewModel.MainMenuViewModel
+import com.cannshine.fortune.db.Database
+import com.cannshine.fortune.BuildConfig
+import com.cannshine.fortune.R
+import com.cannshine.fortune.VolleyRequest.ApplicationController
+import com.cannshine.fortune.base.BaseActivity
+import com.cannshine.fortune.model.AdsManager
+import com.cannshine.fortune.model.Hexegram
+import com.cannshine.fortune.utils.CheckInternet
+import com.cannshine.fortune.utils.Global
+import com.cannshine.fortune.utils.Utils
+import com.cannshine.fortune.detail.DetailActivity
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -53,7 +50,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
-class MainMenuActivity : AppCompatActivity() {
+class MainMenuActivity : BaseActivity() {
     var imgTortoise: ImageView? = null
     var btnStart: ImageView? = null
     var imgCoin1: ImageView? = null
@@ -101,13 +98,13 @@ class MainMenuActivity : AppCompatActivity() {
     var dataHexegram = Database(this)
     var arrayList = ArrayList<Int>()
     var broadcastReceiver: BroadcastReceiver? = null
-    lateinit var viewModel : MainMenuViewModel
+    override fun getContentView(): Int {
+        return R.layout.activity_main_menu
+    }
+    lateinit var mainMenuViewModel: MainMenuViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_main_menu)
-        val binding: ActivityMainMenuBinding = DataBindingUtil.setContentView(this, R.layout.activity_main_menu)
-        viewModel = MainMenuViewModel()
-        viewModel.init(this)
+        mainMenuViewModel = ViewModelProviders.of(this).get(MainMenuViewModel::class.java)
 
         // Admob Banner
         if (CheckInternet.isConnected(this)) {
@@ -153,9 +150,17 @@ class MainMenuActivity : AppCompatActivity() {
             val isneedUpdate = Utils.getFlagToken(this)
             val needUpdate = isneedUpdate[Global.K_TOKEN]
             if (needUpdate == null) {
-                createUser("0")
+                mainMenuViewModel.createUser(success = {
+                    readRequestCreateUser(it, "1")
+                }, fail = {
+                    Utils.setFlagToken(this@MainMenuActivity, "1")
+                })
             } else {
-                createUser(needUpdate)
+                mainMenuViewModel.createUser(success = {
+                    readRequestCreateUser(it, needUpdate)
+                }, fail = {
+                    Utils.setFlagToken(this@MainMenuActivity, "1")
+                })
             }
         } else {
             val token = Utils.getFlagToken(this)
@@ -461,34 +466,35 @@ class MainMenuActivity : AppCompatActivity() {
 
         //return IDHexegram
     }
-    //todo: mvvm
-//    fun setTitle() {
-//        val idDaoNguoc = reverseID(iDHexegram)
-//        val flagHD = reverseID(flag)
-//        var kyTu: String
-//        var flag: String
-//        for (i in 0 until idDaoNguoc.length) {
-//            flag = flagHD[i].toString()
-//            kyTu = idDaoNguoc[i].toString()
-//            if (flag == "1") {
-//                kyTu = if (kyTu == "0") {
-//                    "1"
-//                } else {
-//                    "0"
-//                }
-//            }
-//            idHexe = idHexe + kyTu
-//        }
-//        data = dataHexegram.getValues(idHexe)!!
-//        val name = data.h_name
-//        txvTitle!!.textSize = 15f
-//        txvTitle!!.text = name
-//    }
-//
-//    //dao nguoc chuoi
-//    fun reverseID(id: String?): String {
-//        return StringBuffer(id!!).reverse().toString()
-//    }
+
+    //todo: setTitle in mvvm(viewModel)
+    fun setTitle() {
+        val idDaoNguoc = reverseID(iDHexegram)
+        val flagHD = reverseID(flag)
+        var kyTu: String
+        var flag: String
+        for (i in 0 until idDaoNguoc.length) {
+            flag = flagHD[i].toString()
+            kyTu = idDaoNguoc[i].toString()
+            if (flag == "1") {
+                kyTu = if (kyTu == "0") {
+                    "1"
+                } else {
+                    "0"
+                }
+            }
+            idHexe = idHexe + kyTu
+        }
+        data = dataHexegram.getValues(idHexe)!!
+        val name = data.h_name
+        txvTitle!!.textSize = 15f
+        txvTitle!!.text = name
+    }
+
+    //dao nguoc chuoi
+    fun reverseID(id: String?): String {
+        return StringBuffer(id!!).reverse().toString()
+    }
 
     fun buttomShare() {
         btnShare!!.setOnClickListener {
@@ -691,8 +697,8 @@ class MainMenuActivity : AppCompatActivity() {
                 }
                 setLine(count - 1)
                 if (count == 7) {
-                    //todo: mvvm
-                    viewModel.setTitle(flag)
+//                    mainMenuViewModel.setTitle(flag, iDHexegram)
+                    setTitle()
                 }
             }
 
@@ -790,6 +796,7 @@ class MainMenuActivity : AppCompatActivity() {
         btnSound!!.setImageResource(R.mipmap.btn_unmute)
     }
 
+    //todo: this
     fun createUser(needUpdateFCM: String) {
         val country = this.resources.configuration.locale.country
         val deviceId = Utils.getDeviceId(this)

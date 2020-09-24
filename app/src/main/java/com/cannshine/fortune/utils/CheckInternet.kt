@@ -1,4 +1,4 @@
-package com.cannshine.Fortune.utils
+package com.cannshine.fortune.utils
 
 import android.content.Context
 import android.net.ConnectivityManager
