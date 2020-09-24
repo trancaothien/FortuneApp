@@ -1,9 +1,10 @@
 package com.cannshine.fortune.model
 
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-class AdsInfo(
+data class AdsInfo(
         @SerializedName("id")
         var id: Int,
         @SerializedName("code")
@@ -11,7 +12,7 @@ class AdsInfo(
         @SerializedName("ads_info")
         var ads_info: String)
 
-class Status(
+data class Status(
         @SerializedName("payload")
         var payload: List<AdsInfo>,
         @SerializedName("error")
@@ -19,3 +20,11 @@ class Status(
         @SerializedName("message")
         var message: String
 )
+
+data class StartAppData(@SerializedName("app_id") val appId: String,
+                        @SerializedName("dev_id") val devId: String)
+
+data class AdmobData(
+        @SerializedName("app_id") val appId: String,
+        @SerializedName("banner_id") val bannerId: String,
+        @SerializedName("interstitial_id") val interstitialId: String)

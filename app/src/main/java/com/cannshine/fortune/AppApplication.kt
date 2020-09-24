@@ -1,24 +1,21 @@
 package com.cannshine.fortune
 
 import android.app.Application
-import com.cannshine.fortune.model.AdsInfo
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import androidx.multidex.MultiDex
 
-class AppApplication:Application () {
-    companion object
-    {
+class AppApplication : Application() {
+    companion object {
         public lateinit var application: AppApplication
-        fun getApp():AppApplication
-        {
+        fun getApp(): AppApplication {
             return application
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        application=this
+        application = this
+        MultiDex.install(this)
+
     }
 
 }
