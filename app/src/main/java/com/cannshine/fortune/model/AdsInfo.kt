@@ -5,21 +5,14 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class AdsInfo(
-        @SerializedName("id")
-        var id: Int,
-        @SerializedName("code")
-        var code: String,
-        @SerializedName("ads_info")
-        var ads_info: String)
+        @SerializedName("id") var id: Int,
+        @SerializedName("code") var code: String,
+        @SerializedName("ads_info") var ads_info: String)
 
 data class Status(
-        @SerializedName("payload")
-        var payload: List<AdsInfo>,
-        @SerializedName("error")
-        var error: Int,
-        @SerializedName("message")
-        var message: String
-)
+        @SerializedName("payload") var payload: List<AdsInfo>,
+        @SerializedName("error") var error: Int,
+        @SerializedName("message") var message: String)
 
 data class StartAppData(@SerializedName("app_id") val appId: String,
                         @SerializedName("dev_id") val devId: String)

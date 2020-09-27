@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.cannshine.fortune.API
 import com.cannshine.fortune.model.Status
 import com.cannshine.fortune.model.StatusBanner
+import com.cannshine.fortune.utils.Global
 import retrofit2.Call
 import retrofit2.Callback
 
@@ -29,13 +30,25 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
         })
     }
 
-    fun getBanner(success: (StatusBanner?) -> Unit, fail: () -> Unit, requestBanner: String, appid: Int, type: Int, os: String) {
+    fun getBanner(success: () -> Unit, fail: () -> Unit, requestBanner: String, appid: Int, type: Int, os: String) {
         val request = API.buildService(API.AppRepository::class.java)
         val call = request.getBannerAds(requestBanner, appid, type, os)
         call.enqueue(object : Callback<StatusBanner> {
             override fun onResponse(call: Call<StatusBanner>, response: retrofit2.Response<StatusBanner>) {
                 if (response.isSuccessful) {
-                    success(response.body())
+                    val arrayBannerAds = response.body()?.payload
+                    if (arrayBannerAds != null) {
+                        for (bannerAds in arrayBannerAds) {
+                            val link = bannerAds.link
+                            val photoLink = bannerAds.photo_link
+                            Log.d("linkPhoto", "onCreate: " + link)
+                            val idAds = bannerAds.id
+                            Global.LINK = link
+                            Global.PHOTO_LINK = photoLink
+                            Global.ID_ADS = idAds.toString()
+                        }
+                    }
+                    success()
                 }
             }
 

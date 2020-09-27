@@ -12,15 +12,22 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
+import com.cannshine.fortune.API
+import com.cannshine.fortune.AppApplication
 import com.cannshine.fortune.splash.SplashActivity
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.R
 import com.cannshine.fortune.VolleyRequest.ApplicationController
+import com.cannshine.fortune.model.UpdateFCM
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
 import java.util.*
 
 class MyFirebaseService : FirebaseMessagingService() {
@@ -80,32 +87,28 @@ class MyFirebaseService : FirebaseMessagingService() {
     }
 
     fun updateFCM(deviceId: String?, userKey: String?, token: String) {
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, Global.URL_UPDATE_FCM, Response.Listener { response ->
-            Log.d("newToken", "onResponse: $response")
-            try {
-                val jsonObject = JSONObject(response)
-                val errorRequest = jsonObject.getInt("error")
-                if (errorRequest == 0) {
-                    Utils.setFlagToken(this@MyFirebaseService, "0")
-                } else Utils.setFlagToken(this@MyFirebaseService, "1")
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }, Response.ErrorListener { error -> Log.d("errorNewToken", "onErrorResponse: $error") }) {
-            @Throws(AuthFailureError::class)
-            override fun getBody(): ByteArray {
-                val body = "&act=updatefcm&userkey=$userKey&deviceid=$deviceId&fcm=$token"
-                return body.toByteArray(charset("utf-8"))
+        val request = API.buildService(API.AppRepository::class.java)
+        val act = RequestBody.create("text/plain".toMediaTypeOrNull(), "updatefcm")
+        val userkey = RequestBody.create("text/plain".toMediaTypeOrNull(), "$userKey")
+        val deviceid = RequestBody.create("text/plain".toMediaTypeOrNull(), "$deviceId")
+        val fcm = RequestBody.create("text/plain".toMediaTypeOrNull(), "$token")
+        val call = request.updateFCM(act, userkey, deviceid, fcm)
+
+        call.enqueue(object : Callback<UpdateFCM> {
+            override fun onResponse(call: Call<UpdateFCM>, response: retrofit2.Response<UpdateFCM>) {
+                val updateFCM = response.body()
+                if (updateFCM?.error == 0){
+                    Utils.setFlagToken(AppApplication.application, "0")
+                }else{
+                    Utils.setFlagToken(AppApplication.application, "1")
+                }
             }
 
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers: MutableMap<String, String> = HashMap()
-                headers["apikey"] = Global.APIKEY
-                return headers
+            override fun onFailure(call: Call<UpdateFCM>, t: Throwable) {
+                Utils.setFlagToken(AppApplication.application, "1")
             }
-        }
-        ApplicationController.getInstance(this@MyFirebaseService)?.addToRequestQueue(stringRequest)
+
+        })
     }
 
     companion object {

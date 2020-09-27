@@ -13,6 +13,7 @@ import com.cannshine.fortune.R
 import com.cannshine.fortune.base.BaseActivity
 import com.cannshine.fortune.mainmenu.MainMenuActivity
 import com.cannshine.fortune.model.AdmobData
+import com.cannshine.fortune.model.StartAppData
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.json.JSONObject
@@ -35,26 +36,15 @@ class SplashActivity : BaseActivity() {
         starActivity()
         if (CheckInternet.isConnected(this)) {
             //lấy thông tin gieo quẻ nhanh
-            splashViewModel.getBanner(success = {
-                it?.let {
-                    val arrayBannerAds = it.payload
-                    for (bannerAds in arrayBannerAds) {
-                        val link = bannerAds.link
-                        val photoLink = bannerAds.photo_link
-                        Log.d("linkPhoto", "onCreate: " + link)
-                        val idAds = bannerAds.id
-                        Global.LINK = link
-                        Global.PHOTO_LINK = photoLink
-                        Global.ID_ADS = idAds.toString()
-                    }
-                    if (finishGetAdsInfo && finishSplashTime) {
-                        goToMainMenu()
-                    } else {
-                        finishGetBanner = true
-                    }
+            splashViewModel.getBanner(success =
+            {
+                if (finishGetAdsInfo && finishSplashTime) {
+                    goToMainMenu()
+                } else {
+                    finishGetBanner = true
                 }
-
-            }, fail = {
+            }, fail =
+            {
                 if (finishGetAdsInfo && finishSplashTime) {
                     goToMainMenu()
                 } else {
@@ -62,7 +52,8 @@ class SplashActivity : BaseActivity() {
                 }
             }, "requestBanner", 1, 3, "android")
 
-            splashViewModel.getAdsInfotwo(success = {
+            splashViewModel.getAdsInfotwo(success =
+            {
                 it?.let {
                     var arrayAds: ArrayList<AdsInfo>? = ArrayList()
                     val payloads = it.payload
@@ -71,8 +62,7 @@ class SplashActivity : BaseActivity() {
                         val code = adsInfo.code
                         val ads_info = adsInfo.ads_info
                         val ads = AdsInfo(id, code, ads_info)
-                        arrayAds = ArrayList()
-                        arrayAds.add(ads)
+                        arrayAds?.add(ads)
                     }
                     if (arrayAds != null) {
                         for (i in arrayAds.indices) {
@@ -80,20 +70,11 @@ class SplashActivity : BaseActivity() {
                             if (code == "admob") {
                                 val admob = Gson().fromJson(arrayAds[i].ads_info, AdmobData::class.java)
                                 Log.e("adsInfo", admob.toString())
-                                val abmobAppId = admob.appId
-                                val admobBannerId = admob.bannerId
-                                val admobIntertitalId = admob.interstitialId
-                                if (abmobAppId != null && admobBannerId != null && admobIntertitalId != null) {
-                                    Utils.admobSaveKey(this, Global.KEY_ADMOB, abmobAppId, admobBannerId, admobIntertitalId)
-                                }
+                                Utils.admobSaveKey(this, Global.KEY_ADMOB, admob.appId, admob.bannerId, admob.interstitialId)
                             }
                             if (code == "startapp") {
-                                val `object` = JSONObject(arrayAds[i].ads_info)
-                                val startAppId = `object`.optString("app_id")
-                                val startAppDevId = `object`.optString("dev_id")
-                                if (startAppId != null && startAppDevId != null) {
-                                    Utils.startappSaveKey(this, Global.KEY_STARTAPP, startAppId, startAppDevId)
-                                }
+                                val startapp = Gson().fromJson(arrayAds[i].ads_info, StartAppData::class.java)
+                                Utils.startappSaveKey(this, Global.KEY_STARTAPP, startapp.appId, startapp.devId)
                             }
                         }
                     }
@@ -104,7 +85,8 @@ class SplashActivity : BaseActivity() {
                     }
                 }
 
-            }, fail = {
+            }, fail =
+            {
                 if (finishSplashTime && finishGetBanner) {
                     goToMainMenu()
                 } else {

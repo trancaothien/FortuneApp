@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.cannshine.fortune.mainmenu
 
 import android.Manifest
@@ -28,8 +30,8 @@ import com.android.volley.Response
 import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.NetworkImageView
 import com.android.volley.toolbox.StringRequest
-import com.cannshine.fortune.db.Database
 import com.cannshine.fortune.BuildConfig
+import com.cannshine.fortune.db.Database
 import com.cannshine.fortune.R
 import com.cannshine.fortune.VolleyRequest.ApplicationController
 import com.cannshine.fortune.base.BaseActivity
@@ -39,10 +41,12 @@ import com.cannshine.fortune.utils.CheckInternet
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.detail.DetailActivity
+import com.cannshine.fortune.model.AppVersionInfo
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.gson.Gson
 import com.startapp.android.publish.adsCommon.StartAppAd
 import com.startapp.android.publish.adsCommon.StartAppSDK
 import org.json.JSONException
@@ -50,6 +54,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
+@Suppress("DEPRECATION")
 class MainMenuActivity : BaseActivity() {
     var imgTortoise: ImageView? = null
     var btnStart: ImageView? = null
@@ -145,44 +150,12 @@ class MainMenuActivity : BaseActivity() {
 
         // Hỏi cấp quyền Write
         askPermissionAndWrite()
-        val checkUser = Utils.getUserInfo(this, Global.KEY_USER)
-        if (checkUser == false) {
-            val isneedUpdate = Utils.getFlagToken(this)
-            val needUpdate = isneedUpdate[Global.K_TOKEN]
-            if (needUpdate == null) {
-                mainMenuViewModel.createUser(success = {
-                    readRequestCreateUser(it, "1")
-                }, fail = {
-                    Utils.setFlagToken(this@MainMenuActivity, "1")
-                })
-            } else {
-                mainMenuViewModel.createUser(success = {
-                    readRequestCreateUser(it, needUpdate)
-                }, fail = {
-                    Utils.setFlagToken(this@MainMenuActivity, "1")
-                })
-            }
-        } else {
-            val token = Utils.getFlagToken(this)
-            val updateFlag = token[Global.K_TOKEN]
-            val deviceId = Utils.getDeviceId(this)
-            //            if(updateFlag == null){
-//                Utils.setFlagToken(this, "1");
-//                SharedPreferences s = this.getSharedPreferences(Global.KEY_USER, MODE_PRIVATE);
-//                String userKey = s.getString(Global.K_USERKEY, "");
-//                updateFCM(deviceId, userKey, "");
-//            }
-//            else
-            if (updateFlag != null) {
-                if (updateFlag == "1") {
-                    val s = getSharedPreferences(Global.KEY_USER, MODE_PRIVATE)
-                    val userKey = s.getString(Global.K_USERKEY, "")
-                    val newToken = Utils.getNewToken(this)
-                    updateFCM(deviceId!!, userKey, newToken!!)
-                }
+        mainMenuViewModel.requestUser()
+        mainMenuViewModel.getVersion {
+            if (it?.version_check != null) {
+                if (it.version_check != BuildConfig.VERSION_CODE.toString()) showAlertUpdate(it.version_name, it.store_url, it.need_update)
             }
         }
-        appVersion
         mediaShakeTortoise = MediaPlayer.create(this@MainMenuActivity, R.raw.sowhexagram)
         mediaUpCoin = MediaPlayer.create(this@MainMenuActivity, R.raw.coin)
         btnStart = findViewById<View>(R.id.btn_done) as ImageView
@@ -796,94 +769,12 @@ class MainMenuActivity : BaseActivity() {
         btnSound!!.setImageResource(R.mipmap.btn_unmute)
     }
 
-    //todo: this
-    fun createUser(needUpdateFCM: String) {
-        val country = this.resources.configuration.locale.country
-        val deviceId = Utils.getDeviceId(this)
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, Global.URL_MAIN_CREATE_USER, Response.Listener { response ->
-            Log.d("voll", "onResponse: $response")
-            try {
-                readRequestCreateUser(response, needUpdateFCM)
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }, Response.ErrorListener { Utils.setFlagToken(this@MainMenuActivity, "1") }) {
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val params = HashMap<String, String>()
-                params["apikey"] = Global.APIKEY
-                //                params.put("Content-Type", "application/json");
-                return params
-            }
-
-            @Throws(AuthFailureError::class)
-            override fun getBody(): ByteArray {
-                val body = "&act=newuser&os=android&deviceid=$deviceId&location=$country&appid=1"
-                return body.toByteArray(charset("utf-8"))
-            }
-        }
-        ApplicationController.getInstance(this)?.addToRequestQueue(stringRequest)
-    }
-
-    val appVersion: Unit
-        get() {
-            val stringRequest: StringRequest = object : StringRequest(Method.GET, Global.URL_MAIN_GET_VERSION, Response.Listener { response ->
-                Log.d("responseGetAppVersion", "onResponse: $response")
-                try {
-                    readGetAppVersion(response)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                } catch (e: PackageManager.NameNotFoundException) {
-                    e.printStackTrace()
-                }
-            }, Response.ErrorListener { error -> Log.d("responseGetAppVersion", "onResponse: $error") }) {
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers = HashMap<String, String>()
-                    headers["apikey"] = Global.APIKEY
-                    headers["Content-Type"] = "application/x-www-form-urlencoded"
-                    return headers
-                }
-            }
-            ApplicationController.getInstance(this)?.addToRequestQueue(stringRequest)
-        }
-
-    @Throws(JSONException::class)
-    private fun readRequestCreateUser(response: String, needUpdateFCM: String) {
-        val jsonObject = JSONObject(response)
-        val info_user = jsonObject.optJSONObject("payload")
-        val user_id = info_user.optString("user_id")
-        val user_key = info_user.optString("user_key")
-        if (user_id != null && user_key != null) {
-            Utils.saveUserInfo(this, Global.KEY_USER, user_id, user_key)
-            if (needUpdateFCM == "1") {
-                val newToken = Utils.getNewToken(this)
-                updateFCM(Utils.getDeviceId(this)!!, user_key, newToken!!)
-            }
-        }
-    }
-
-    @Throws(JSONException::class, PackageManager.NameNotFoundException::class)
-    private fun readGetAppVersion(response: String) {
-        val json = JSONObject(response)
-        val info = json.optJSONObject("payload")
-        val versionName = info.optString("version_name")
-        val versionCode = info.optString("version_check")
-        val linkUpdate = info.optString("store_url")
-        val need_update = info.optInt("need_update")
-        if (versionCode != null && linkUpdate != null) {
-            if (versionCode != BuildConfig.VERSION_CODE.toString()) showAlertUpdate(versionName, linkUpdate, need_update)
-        }
-    }
-
     @Throws(PackageManager.NameNotFoundException::class)
-    private fun showAlertUpdate(versionName: String, link: String, update: Int) {
+    private fun showAlertUpdate(versionName: String, link: String, update: String) {
         val manager = this.packageManager
         val info = manager.getPackageInfo(
                 this.packageName, 0)
         val version = info.versionName
-
-//        if(!versionName.equals(version)){
         val builder = AlertDialog.Builder(this)
         builder.setCancelable(false)
         builder.setMessage("Ứng dụng đang có phiên bản $versionName. Vui lòng cập nhật!")
@@ -893,13 +784,12 @@ class MainMenuActivity : BaseActivity() {
                     i.data = Uri.parse(link)
                     startActivity(i)
                 }
-        if (update == 0) {
+        if (update == "0") {
             builder.setNegativeButton("CANCEL") { dialog, which -> dialog.dismiss() }
         }
         val dialog: Dialog = builder.create()
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
-        //        }
     }
 
     private fun showAlertMessage(message: String, title: String) {
@@ -913,55 +803,6 @@ class MainMenuActivity : BaseActivity() {
         dialog.show()
     }
 
-    fun updateFCM(deviceId: String, userKey: String?, newToken: String) {
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, Global.URL_UPDATE_FCM, Response.Listener { response ->
-            Log.d("fcm", "onResponse: $response")
-            try {
-                val jsonObject = JSONObject(response)
-                val requestError = jsonObject.optInt("error")
-                if (requestError == 0) {
-                    Utils.setFlagToken(this@MainMenuActivity, "0")
-                } else Utils.setFlagToken(this@MainMenuActivity, "1")
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-        }, Response.ErrorListener { error ->
-            Log.d("fcmerror", "onErrorResponse: $error")
-            Utils.setFlagToken(this@MainMenuActivity, "1")
-        }) {
-            @Throws(AuthFailureError::class)
-            override fun getBody(): ByteArray {
-                val body = "&act=updatefcm&userkey=$userKey&deviceid=$deviceId&fcm=$newToken"
-                return body.toByteArray(charset("utf-8"))
-            }
-
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers: MutableMap<String, String> = HashMap()
-                headers["apikey"] = Global.APIKEY
-                return headers
-            }
-        }
-        ApplicationController.getInstance(this)?.addToRequestQueue(stringRequest)
-    }
-
-    //    public void restoreMain(){
-    //        count = 1;
-    //        imgLine1.setImageResource(R.mipmap.line_bg);
-    //        imgLine2.setImageResource(R.mipmap.line_bg);
-    //        imgLine3.setImageResource(R.mipmap.line_bg);
-    //        imgLine4.setImageResource(R.mipmap.line_bg);
-    //        imgLine5.setImageResource(R.mipmap.line_bg);
-    //        imgLine6.setImageResource(R.mipmap.line_bg);
-    //        btnStart.setImageResource(R.mipmap.button_done);
-    //        txvTitle.setText("Thành tâm khấn nguyện!");
-    //        txvTitle.setTextSize(20);
-    //        txvCount.setText("Hào 1");
-    //        txvCount.setTextSize(15);
-    //        idHexe = "";
-    //        flag = "";
-    //        iDHexegram = "";
-    //    }
     override fun onResume() {
         super.onResume()
         //restoreMain();
@@ -985,31 +826,12 @@ class MainMenuActivity : BaseActivity() {
     private fun clickBtnGieoQueNhanh(url: String, idAds: String) {
         btnGieoQueNhanh!!.setOnClickListener {
             Log.d("idAds", "idAds $idAds")
-            clickAds(idAds)
+            mainMenuViewModel.clickAds(idAds)
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW
             intent.data = Uri.parse(url)
             startActivity(intent)
         }
-    }
-
-    private fun clickAds(idAds: String) {
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, Global.URL_DETAIL_CLICK_ADS, Response.Listener { response -> Log.d("responseClickAds", "onResponse: $response") }, Response.ErrorListener { error -> Log.d("responseClickAdsError", "onResponse: $error") }) {
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers = HashMap<String, String>()
-                headers["apikey"] = Global.APIKEY
-                return headers
-            }
-
-            @Throws(AuthFailureError::class)
-            override fun getBody(): ByteArray {
-                val bodys = "&act=clickads&bannerid=$idAds&appid=1&os=android"
-                Log.d("bodys", "getBody: $bodys")
-                return bodys.toByteArray(charset("utf-8"))
-            }
-        }
-        ApplicationController.getInstance(this)?.addToRequestQueue(stringRequest)
     }
 
     companion object {

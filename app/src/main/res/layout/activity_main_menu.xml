@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable
-            name="tenXam"
-            type="com.cannshine.fortune.mainmenu.MainMenuViewModel" />
+<!--        <variable-->
+<!--            name="tenXam"-->
+<!--            type="com.cannshine.fortune.mainmenu.MainMenuViewModel" />-->
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -182,7 +182,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginRight="10dp"
                     android:gravity="center"
-                    android:text='@{tenXam.txvTitle, default="Thành tâm khánh nguyện"}'
+                    android:text="Thành tâm khánh nguyện"
                     android:textSize="20dp"
                     android:textStyle="bold" />
             </LinearLayout>

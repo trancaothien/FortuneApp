@@ -2,7 +2,7 @@ package com.cannshine.fortune.model
 
 import com.google.gson.annotations.SerializedName
 
-class BannerAds(
+data class BannerAds(
         @SerializedName("id")
         var id: Int,
         @SerializedName("name")
@@ -17,7 +17,7 @@ class BannerAds(
         var is_active: Int) {
 }
 
-class StatusBanner(
+data class StatusBanner(
         @SerializedName("payload")
         var payload: List<BannerAds>,
         @SerializedName("error")

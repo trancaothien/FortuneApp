@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.android.volley.AuthFailureError
 import com.android.volley.Response
@@ -27,6 +28,7 @@ import com.cannshine.fortune.db.Database
 import com.cannshine.fortune.customView.InteractiveScrollView.OnBottomReachedListener
 import com.cannshine.fortune.R
 import com.cannshine.fortune.VolleyRequest.ApplicationController
+import com.cannshine.fortune.base.BaseActivity
 import com.cannshine.fortune.mainmenu.MainMenuActivity
 import com.cannshine.fortune.model.AdsManager
 import com.cannshine.fortune.model.Hexegram
@@ -34,13 +36,17 @@ import com.cannshine.fortune.utils.CheckInternet
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.customView.InteractiveScrollView
+import com.cannshine.fortune.model.BannerAds
+import com.cannshine.fortune.splash.SplashViewModel
 import com.google.android.gms.ads.*
+import com.google.gson.Gson
 import com.startapp.android.publish.adsCommon.StartAppAd
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 
-class DetailActivity : AppCompatActivity() {
+class DetailActivity : BaseActivity() {
     var svContent: InteractiveScrollView? = null
     var imgBack: ImageView? = null
     var btnShare: ImageView? = null
@@ -63,11 +69,16 @@ class DetailActivity : AppCompatActivity() {
     private val startAppAd = StartAppAd(this)
     var adsManager = AdsManager.instance
     var ad = AdsManager.ad
-    var infoAds: List<String>? = null
+    var infoAds: List<BannerAds>? = ArrayList()
     var broadcastReceiver: BroadcastReceiver? = null
+    lateinit var detailViewModel: DetailViewModel
+    override fun getContentView(): Int {
+        return R.layout.activity_detail
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detail)
+        //setContentView(R.layout.activity_detail)
+        detailViewModel = ViewModelProviders.of(this).get(DetailViewModel::class.java)
         val admobInfo = Utils.getAdsInfo(this, Global.KEY_ADMOB)
         val appId = admobInfo[Global.ADMOB_APP_ID]
         val interstitialId = admobInfo[Global.ADMOB_INTERSTITIAL_ID]
@@ -105,7 +116,9 @@ class DetailActivity : AppCompatActivity() {
         btnClose?.setVisibility(View.GONE)
 
         //Lấy thông tin của quảng cáo
-        banner
+        detailViewModel.getBanner {
+            infoAds = listOf(it[0])
+        }
 
         // hiển thị quảng cáo full màn hình
         showAdsFullScreen()
@@ -173,55 +186,6 @@ class DetailActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-    }
-
-    // Lấy quảng cáo
-    private val banner: Unit
-        private get() {
-            val stringRequest: StringRequest = object : StringRequest(Method.GET, Global.URL_DETAIL_GET_ADS_BANNER, Response.Listener { response ->
-                Log.d("reponseGetBanner", "onResponse: $response")
-                try {
-                    infoAds = readBanner(response)
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                }
-            }, Response.ErrorListener { error -> Log.d("reponseGetBannerError", "onResponse: $error") }) {
-                @Throws(AuthFailureError::class)
-                override fun getBody(): ByteArray {
-                    val bodys = "&action=ads&type=1&size=400x400"
-                    return bodys.toByteArray(charset("utf-8"))
-                }
-
-                @Throws(AuthFailureError::class)
-                override fun getHeaders(): Map<String, String> {
-                    val headers = HashMap<String, String>()
-                    headers["apikey"] = Global.APIKEY
-                    return headers
-                }
-            }
-            ApplicationController.getInstance(this)?.addToRequestQueue(stringRequest)
-        }
-
-    // sự kiện khi click vào adsbanner
-    private fun clickAds(idAds: String) {
-        val stringRequest: StringRequest = object : StringRequest(Method.POST, Global.URL_DETAIL_CLICK_ADS,
-                Response.Listener { response -> Log.d("responseClickAds", "onResponse: $response") },
-                Response.ErrorListener { error -> Log.d("responseClickAdsError", "onResponse: $error") }) {
-            @Throws(AuthFailureError::class)
-            override fun getHeaders(): Map<String, String> {
-                val headers = HashMap<String, String>()
-                headers["apikey"] = Global.APIKEY
-                return headers
-            }
-
-            @Throws(AuthFailureError::class)
-            override fun getBody(): ByteArray {
-                val bodys = "&act=clickads&bannerid=$idAds&appid=1&os=android"
-                Log.d("bodys", "getBody: $bodys")
-                return bodys.toByteArray(charset("utf-8"))
-            }
-        }
-        ApplicationController.getInstance(this)?.addToRequestQueue(stringRequest)
     }
 
     //button share
@@ -382,7 +346,7 @@ class DetailActivity : AppCompatActivity() {
             imgBack!!.isEnabled = true
             btnShare!!.isEnabled = true
             //request api
-            clickAds(idAds)
+            detailViewModel.clickAds(idAds)
             val intent = Intent()
             intent.action = Intent.ACTION_VIEW
             intent.data = Uri.parse(link)
@@ -416,9 +380,9 @@ class DetailActivity : AppCompatActivity() {
         if (CheckInternet.isConnected(this)) {
             svContent!!.onBottomReachedListener = object : OnBottomReachedListener {
                 override fun onBottomReached() {
-                    val link = infoAds!![0]
-                    val photoLink = infoAds!![1]
-                    val idAds = infoAds!![2]
+                    val link = infoAds!![0].link
+                    val photoLink = infoAds!![0].photo_link
+                    val idAds = infoAds!![0].id
                     if (link != null && photoLink != null) {
                         bgBanner!!.visibility = View.VISIBLE
                         imgBanner!!.visibility = View.VISIBLE
@@ -429,7 +393,7 @@ class DetailActivity : AppCompatActivity() {
                         imageLoader?.get(photoLink, ImageLoader.getImageListener(imgBanner, 0, 0))
                         imgBanner!!.setImageUrl("url", imageLoader)
                         // click vào quảng cáo
-                        clickAdsBanner(link, idAds)
+                        clickAdsBanner(link, idAds.toString())
                         // click vào btnclose
                         clickCloseAds()
                     }
