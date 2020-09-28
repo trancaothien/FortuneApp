@@ -110,7 +110,6 @@ class MainMenuActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainMenuViewModel = ViewModelProviders.of(this).get(MainMenuViewModel::class.java)
-
         // Admob Banner
         if (CheckInternet.isConnected(this)) {
             val admobInfo = Utils.getAdsInfo(this, Global.KEY_ADMOB)

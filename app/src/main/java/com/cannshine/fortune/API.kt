@@ -81,11 +81,16 @@ object API {
                           @Query("os") os: String
         ): Call<GetAppVersionStatus>
 
-        @Multipart
-        @POST("index.php?act=requestBanner&type=2&appid=1&os=android")
-        fun getBannerAdsDetail(@Part("action") action: RequestBody,
-                               @Part("type") typeBody: RequestBody,
-                               @Part("size") size: RequestBody
+        @FormUrlEncoded
+        @POST("index.php")
+        fun getBannerAdsDetail(
+                @Query("act") requestBanner: String,
+                @Query("appid") appid: Int,
+                @Query("type") type: Int,
+                @Query("os") os: String,
+                @Field("action") action: String,
+                @Field("type") typeBody: Int,
+                @Field("size") size: String
         ): Call<StatusBanner>
     }
 }

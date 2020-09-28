@@ -75,6 +75,7 @@ class DetailActivity : BaseActivity() {
     override fun getContentView(): Int {
         return R.layout.activity_detail
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_detail)
@@ -116,9 +117,10 @@ class DetailActivity : BaseActivity() {
         btnClose?.setVisibility(View.GONE)
 
         //Lấy thông tin của quảng cáo
-        detailViewModel.getBanner {
-            infoAds = listOf(it[0])
-        }
+        detailViewModel.getBanner(
+                success =
+                { infoAds = listOf(it[0]) }, "requestBanner", 1, 2, "android"
+        )
 
         // hiển thị quảng cáo full màn hình
         showAdsFullScreen()

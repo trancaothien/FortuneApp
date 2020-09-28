@@ -13,13 +13,10 @@ import retrofit2.Call
 import retrofit2.Response
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
-    fun getBanner(success: (List<BannerAds>) -> Unit){
+    fun getBanner(success: (List<BannerAds>) -> Unit, requestBanner: String, appid: Int, type: Int, os: String) {
         val request = API.buildService(API.AppRepository::class.java)
-        val action = RequestBody.create("text/plain".toMediaTypeOrNull(), "ads")
-        val type = RequestBody.create("text/plain".toMediaTypeOrNull(), "1")
-        val size = RequestBody.create("text/plain".toMediaTypeOrNull(), "400x400")
-        val call = request.getBannerAdsDetail(action, type, size)
-        call.enqueue(object : retrofit2.Callback<StatusBanner>{
+        val call = request.getBannerAdsDetail(requestBanner, appid, type, os, "ads", 1, "400x400")
+        call.enqueue(object : retrofit2.Callback<StatusBanner> {
             override fun onResponse(call: Call<StatusBanner>, response: Response<StatusBanner>) {
                 val listBanner = response.body()?.payload
                 if (listBanner != null) {
@@ -34,7 +31,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         })
     }
 
-    fun clickAds(id: String){
+    fun clickAds(id: String) {
         val act = RequestBody.create("text/plain".toMediaTypeOrNull(), "clickads")
         val bannerid = RequestBody.create("text/plain".toMediaTypeOrNull(), "$id")
         val appid = RequestBody.create("text/plain".toMediaTypeOrNull(), "1")
