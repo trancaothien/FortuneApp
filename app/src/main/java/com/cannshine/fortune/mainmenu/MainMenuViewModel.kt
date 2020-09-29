@@ -12,6 +12,7 @@ import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import retrofit2.Call
 import retrofit2.Callback
+import java.util.*
 
 @Suppress("DEPRECATION")
 class MainMenuViewModel(application: Application) : AndroidViewModel(application) {
@@ -119,4 +120,51 @@ class MainMenuViewModel(application: Application) : AndroidViewModel(application
 
         })
     }
+
+    fun arrayNumber(): ArrayList<Int> {
+        val rD = Random()
+        val list = ArrayList<Int>()
+        val listCoin = ArrayList<Int>()
+        var even = 50
+        var odd = 50
+        for (i in 0..99) {
+            var rand = random()
+            if (even == 0) {
+                rand = 0
+                even -= 1
+            } else if (odd == 0) {
+                rand = 1
+                odd -= 1
+            } else {
+                if (rand == 0) {
+                    even -= 1
+                } else {
+                    odd -= 1
+                }
+            }
+            list.add(rand)
+        }
+        val i1 = rD.nextInt(100)
+        val i2 = rD.nextInt(100)
+        val i3 = rD.nextInt(100)
+        val c1 = list[i1]
+        val c2 = list[i2]
+        val c3 = list[i3]
+        listCoin.add(c1)
+        listCoin.add(c2)
+        listCoin.add(c3)
+        return listCoin
+    }
+
+    private fun random(): Int {
+        val temp: Int
+        val random = Random()
+        temp = random.nextInt(10)
+        return if (temp % 2 == 0) {
+            0
+        } else {
+            1
+        }
+    }
+
 }

@@ -139,7 +139,7 @@ class MainMenuActivity : BaseActivity() {
             }
         }
         setInvisibleCoin()
-        //todo: this
+
         if (Global.LINK != null && Global.PHOTO_LINK != null) {
             setBtnGieoQueNhanh(Global.PHOTO_LINK)
             clickBtnGieoQueNhanh(Global.LINK!!, Global.ID_ADS!!)
@@ -169,7 +169,7 @@ class MainMenuActivity : BaseActivity() {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
             initAnimation()
             if (check == true) {
-                arrayList = arrayNumber()
+                arrayList = mainMenuViewModel.arrayNumber()
                 count += 1
                 if (count <= 6) {
                     binding.imgTortoise.startAnimation(downTortoise)
@@ -396,7 +396,6 @@ class MainMenuActivity : BaseActivity() {
         //return IDHexegram
     }
 
-    //todo: setTitle in mvvm(viewModel)
     fun setTitle() {
         val idDaoNguoc = reverseID(iDHexegram)
         val flagHD = reverseID(flag)
@@ -477,55 +476,6 @@ class MainMenuActivity : BaseActivity() {
         }
     }
 
-    fun createDB() {
-        dataHexegram.createDB()
-    }
-
-    fun arrayNumber(): ArrayList<Int> {
-        val rD = Random()
-        val list = ArrayList<Int>()
-        val listCoin = ArrayList<Int>()
-        var even = 50
-        var odd = 50
-        for (i in 0..99) {
-            var rand = random()
-            if (even == 0) {
-                rand = 0
-                even -= 1
-            } else if (odd == 0) {
-                rand = 1
-                odd -= 1
-            } else {
-                if (rand == 0) {
-                    even -= 1
-                } else {
-                    odd -= 1
-                }
-            }
-            list.add(rand)
-        }
-        val i1 = rD.nextInt(100)
-        val i2 = rD.nextInt(100)
-        val i3 = rD.nextInt(100)
-        val c1 = list[i1]
-        val c2 = list[i2]
-        val c3 = list[i3]
-        listCoin.add(c1)
-        listCoin.add(c2)
-        listCoin.add(c3)
-        return listCoin
-    }
-
-    private fun random(): Int {
-        val temp: Int
-        val random = Random()
-        temp = random.nextInt(10)
-        return if (temp % 2 == 0) {
-            0
-        } else {
-            1
-        }
-    }
 
     fun initAnimationDownTortoise(distance: Int) {
         downTortoise = TranslateAnimation(0F, 0F, 0F, distance.toFloat())
@@ -786,5 +736,9 @@ class MainMenuActivity : BaseActivity() {
 
     companion object {
         private const val REQUEST_ID_WRITE_PERMISSION = 2
+    }
+
+    fun createDB() {
+        dataHexegram.createDB()
     }
 }
