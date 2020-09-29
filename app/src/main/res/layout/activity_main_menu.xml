@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-<!--        <variable-->
-<!--            name="tenXam"-->
-<!--            type="com.cannshine.fortune.mainmenu.MainMenuViewModel" />-->
+        <variable
+            name="data"
+            type="com.cannshine.fortune.mainmenu.MainMenuActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -124,42 +124,42 @@
                 android:layout_marginBottom="15dp">
 
                 <ImageView
-                    android:id="@+id/img_line6"
+                    android:id="@+id/imgLine6"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:src="@mipmap/line_bg" />
 
                 <ImageView
-                    android:id="@+id/img_line5"
+                    android:id="@+id/imgLine5"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:src="@mipmap/line_bg" />
 
                 <ImageView
-                    android:id="@+id/img_line4"
+                    android:id="@+id/imgLine4"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:src="@mipmap/line_bg" />
 
                 <ImageView
-                    android:id="@+id/img_line3"
+                    android:id="@+id/imgLine3"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:src="@mipmap/line_bg" />
 
                 <ImageView
-                    android:id="@+id/img_line2"
+                    android:id="@+id/imgLine2"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:src="@mipmap/line_bg" />
 
                 <ImageView
-                    android:id="@+id/img_line1"
+                    android:id="@+id/imgLine1"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -177,7 +177,7 @@
                 android:layout_marginBottom="30dp">
 
                 <TextView
-                    android:id="@+id/txv_title"
+                    android:id="@+id/txvTitle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginRight="10dp"
@@ -215,16 +215,16 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:visibility="invisible"
-                    android:src="@mipmap/button_more" />
+                    android:src="@drawable/button_more" />
             </LinearLayout>
 
             <ImageView
-                android:id="@+id/btn_done"
+                android:id="@+id/btnDone"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:padding="5dp"
-                android:src="@mipmap/button_done" />
+                android:src="@drawable/button_done" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -234,11 +234,11 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/btn_share"
+                    android:id="@+id/btnShare"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:src="@mipmap/button_share" />
+                    android:src="@drawable/button_share" />
             </LinearLayout>
         </LinearLayout>
 
@@ -251,7 +251,7 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
-                android:id="@+id/txv_count"
+                android:id="@+id/txvCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hào 1"
@@ -273,8 +273,8 @@
             android:textSize="20dp"
             app:layout_constraintTop_toBottomOf="@id/ll_menu" />
 
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/btn_gieo_que_nhanh"
+        <ImageView
+            android:id="@+id/btnGieoQueNhanh"
             android:layout_width="0dp"
             android:clickable="true"
             android:layout_height="0dp"
@@ -295,7 +295,7 @@
             app:layout_constraintTop_toBottomOf="@id/guideline7" />
 
         <ImageView
-            android:id="@+id/img_disk"
+            android:id="@+id/imgDisk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
@@ -307,33 +307,42 @@
             app:layout_constraintTop_toTopOf="@+id/img_trigrams" />
 
         <ImageView
-            android:id="@+id/img_coin1"
+            android:id="@+id/imgCoin1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/guideline3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:src="@mipmap/icon_coin_0"
+            android:src="@drawable/icon_coin_0"
+            android:adjustViewBounds="true"
+            android:maxHeight="40dp"
+            android:maxWidth="40dp"
             android:visibility="visible" />
 
         <ImageView
-            android:id="@+id/img_coin2"
+            android:id="@+id/imgCoin2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/guideline3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@mipmap/icon_coin_0"
+            android:src="@drawable/icon_coin_0"
+            android:adjustViewBounds="true"
+            android:maxHeight="40dp"
+            android:maxWidth="40dp"
             android:visibility="visible" />
 
         <ImageView
-            android:id="@+id/img_coin3"
+            android:id="@+id/imgCoin3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/guideline3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:src="@mipmap/icon_coin_0"
+            android:adjustViewBounds="true"
+            android:maxHeight="40dp"
+            android:maxWidth="40dp"
+            android:src="@drawable/icon_coin_0"
             android:visibility="visible" />
 
         <com.startapp.android.publish.ads.banner.Banner
@@ -353,17 +362,17 @@
             app:layout_constraintBottom_toBottomOf="parent"></RelativeLayout>
 
         <ImageView
-            android:id="@+id/img_tortoise"
+            android:id="@+id/imgTortoise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/icon_tortoise_0"
-            app:layout_constraintTop_toTopOf="@id/img_disk"
-            app:layout_constraintBottom_toBottomOf="@id/img_disk"
-            app:layout_constraintEnd_toEndOf="@id/img_disk"
-            app:layout_constraintStart_toStartOf="@id/img_disk" />
+            app:layout_constraintTop_toTopOf="@id/imgDisk"
+            app:layout_constraintBottom_toBottomOf="@id/imgDisk"
+            app:layout_constraintEnd_toEndOf="@id/imgDisk"
+            app:layout_constraintStart_toStartOf="@id/imgDisk" />
 
         <ImageView
-            android:id="@+id/btn_sound"
+            android:id="@+id/btnSound"
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:layout_constraintTop_toTopOf="@id/guideline5"

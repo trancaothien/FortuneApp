@@ -15,8 +15,6 @@ import com.cannshine.fortune.mainmenu.MainMenuActivity
 import com.cannshine.fortune.model.AdmobData
 import com.cannshine.fortune.model.StartAppData
 import com.google.gson.Gson
-import com.google.gson.JsonObject
-import org.json.JSONObject
 import kotlin.collections.ArrayList
 
 class SplashActivity : BaseActivity() {
@@ -55,7 +53,7 @@ class SplashActivity : BaseActivity() {
             splashViewModel.getAdsInfotwo(success =
             {
                 it?.let {
-                    var arrayAds: ArrayList<AdsInfo>? = ArrayList()
+                    val arrayAds: ArrayList<AdsInfo>? = ArrayList()
                     val payloads = it.payload
                     for (adsInfo in payloads) {
                         val id = adsInfo.id

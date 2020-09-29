@@ -2,7 +2,6 @@ package com.cannshine.fortune
 
 import com.cannshine.fortune.model.*
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -50,29 +49,29 @@ object API {
                          @Query("os") os: String
         ): Call<StatusBanner>
 
-        @Multipart
+        @FormUrlEncoded
         @POST("index.php")
-        fun createUser(@Part("act") act: RequestBody,
-                       @Part("os") os: RequestBody,
-                       @Part("deviceid") deviceid: RequestBody,
-                       @Part("location") location: RequestBody,
-                       @Part("appid") appid: RequestBody
+        fun createUser(@Field("act") act: String,
+                       @Field("os") os: String,
+                       @Field("deviceid") deviceid: String,
+                       @Field("location") location: String,
+                       @Field("appid") appid: Int
         ): Call<UserStatus>
 
-        @Multipart
+        @FormUrlEncoded
         @POST("index.php")
-        fun updateFCM(@Part("act") act: RequestBody,
-                      @Part("userkey") userkey: RequestBody,
-                      @Part("deviceid") deviceid: RequestBody,
-                      @Part("fcm") fcm: RequestBody
+        fun updateFCM(@Field("act") act: String,
+                      @Field("userkey") userkey: String,
+                      @Field("deviceid") deviceid: String,
+                      @Field("fcm") fcm: String
         ): Call<UpdateFCM>
 
-        @Multipart
+        @FormUrlEncoded
         @POST("index.php")
-        fun clickAds(@Part("act") act: RequestBody,
-                     @Part("bannerid") bannerid: RequestBody,
-                     @Part("appid") appid: RequestBody,
-                     @Part("os") os: RequestBody
+        fun clickAds(@Field("act") act: String,
+                     @Field("bannerid") bannerid: String,
+                     @Field("appid") appid: Int,
+                     @Field("os") os: String
         ): Call<ClickAds>
 
         @GET("index.php")

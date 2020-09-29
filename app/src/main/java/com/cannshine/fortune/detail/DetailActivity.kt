@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.cannshine.fortune.detail
 
 import android.app.Dialog
@@ -5,29 +7,19 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.View
-import android.widget.ImageView
 import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.android.volley.AuthFailureError
-import com.android.volley.Response
-import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.NetworkImageView
-import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
 import com.cannshine.fortune.db.Database
 import com.cannshine.fortune.customView.InteractiveScrollView.OnBottomReachedListener
 import com.cannshine.fortune.R
-import com.cannshine.fortune.VolleyRequest.ApplicationController
 import com.cannshine.fortune.base.BaseActivity
 import com.cannshine.fortune.mainmenu.MainMenuActivity
 import com.cannshine.fortune.model.AdsManager
@@ -35,76 +27,40 @@ import com.cannshine.fortune.model.Hexegram
 import com.cannshine.fortune.utils.CheckInternet
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
-import com.cannshine.fortune.customView.InteractiveScrollView
+import com.cannshine.fortune.databinding.ActivityDetailBinding
 import com.cannshine.fortune.model.BannerAds
-import com.cannshine.fortune.splash.SplashViewModel
 import com.google.android.gms.ads.*
-import com.google.gson.Gson
 import com.startapp.android.publish.adsCommon.StartAppAd
-import org.json.JSONException
-import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "DEPRECATION", "RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class DetailActivity : BaseActivity() {
-    var svContent: InteractiveScrollView? = null
-    var imgBack: ImageView? = null
-    var btnShare: ImageView? = null
-    var btnClose: ImageView? = null
-    var bgBanner: ImageView? = null
-    var imgBanner: NetworkImageView? = null
-    var imageLoader: ImageLoader? = null
-    var txvTitle: TextView? = null
-    var txvContent: TextView? = null
-    var txvTieuDe: TextView? = null
-    var hao1: ImageView? = null
-    var hao2: ImageView? = null
-    var hao3: ImageView? = null
-    var hao4: ImageView? = null
-    var hao5: ImageView? = null
-    var hao6: ImageView? = null
-    var constraintLayout: ConstraintLayout? = null
+//    var imageLoader: ImageLoader? = null
     var data = Database(this)
     var hexegram = Hexegram()
     private val startAppAd = StartAppAd(this)
-    var adsManager = AdsManager.instance
     var ad = AdsManager.ad
     var infoAds: List<BannerAds>? = ArrayList()
     var broadcastReceiver: BroadcastReceiver? = null
     lateinit var detailViewModel: DetailViewModel
+    lateinit var binding: ActivityDetailBinding
     override fun getContentView(): Int {
         return R.layout.activity_detail
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_detail)
         detailViewModel = ViewModelProviders.of(this).get(DetailViewModel::class.java)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail)
         val admobInfo = Utils.getAdsInfo(this, Global.KEY_ADMOB)
         val appId = admobInfo[Global.ADMOB_APP_ID]
-        val interstitialId = admobInfo[Global.ADMOB_INTERSTITIAL_ID]
         if (CheckInternet.isConnected(this)) {
             // quảng cáo banner của admob
             if (appId != null) {
                 adsAdmobBanner(appId, admobInfo[Global.ADMOB_BANNER_ID])
             }
         }
-        txvContent = findViewById<View>(R.id.txv_giaixam) as TextView
-        imgBack = findViewById<View>(R.id.btn_back) as ImageView
-        txvTitle = findViewById<View>(R.id.txv_title_dl) as TextView
-        txvTieuDe = findViewById<View>(R.id.txv_tieude) as TextView
-        btnShare = findViewById<View>(R.id.btn_share_dl) as ImageView
-        hao1 = findViewById<View>(R.id.img_h1) as ImageView
-        hao2 = findViewById<View>(R.id.img_h2) as ImageView
-        hao3 = findViewById<View>(R.id.img_h3) as ImageView
-        hao4 = findViewById<View>(R.id.img_h4) as ImageView
-        hao5 = findViewById<View>(R.id.img_h5) as ImageView
-        hao6 = findViewById<View>(R.id.img_h6) as ImageView
-        imgBanner = findViewById<View>(R.id.img_ads) as NetworkImageView
-        btnClose = findViewById(R.id.btn_close)
-        svContent = findViewById(R.id.sv_content)
-        constraintLayout = findViewById<View>(R.id.constrainLayout) as ConstraintLayout
-        bgBanner = findViewById(R.id.bg_banner)
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 showAlertMessage(intent.getStringExtra("body"), intent.getStringExtra("title"))
@@ -112,9 +68,9 @@ class DetailActivity : BaseActivity() {
         }
 
         // set default cho ads va btn close
-        bgBanner?.setVisibility(View.GONE)
-        imgBanner!!.visibility = View.GONE
-        btnClose?.setVisibility(View.GONE)
+        binding.bgBanner.setVisibility(View.GONE)
+        binding.imgAds.visibility = View.GONE
+        binding.btnClose.setVisibility(View.GONE)
 
         //Lấy thông tin của quảng cáo
         detailViewModel.getBanner(
@@ -133,8 +89,8 @@ class DetailActivity : BaseActivity() {
 
         // click btn share
         setBtnShare()
-        val fontTitle = Typeface.createFromAsset(this.assets, "UTM Azuki.ttf")
-        txvTitle!!.setTypeface(fontTitle)
+        val fontTitle = Utils.getFontType(this)
+        binding.txvTitleDl.typeface = fontTitle
         val intent = intent
         val idHexegram = intent.getStringExtra("key_1")
         val h1 = intent.getStringExtra("hao_1")
@@ -148,14 +104,14 @@ class DetailActivity : BaseActivity() {
         setLineHexegram(h1, h2, h3, h4, h5, h6)
         hexegram = data.getValues(idHexegram)!!
         val title = hexegram.h_name
-        txvTitle!!.textSize = 15f
-        txvTitle!!.text = title
+        binding.txvTitleDl.textSize = 15f
+        binding.txvTitleDl.text = title
         var tieuDe = ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
                 + "<html><head>"
                 + "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"  />"
                 + "<head><body>")
         tieuDe += hexegram.h_mean + "<body><html>"
-        txvTieuDe!!.text = Html.fromHtml(tieuDe)
+        binding.txvTieuDe.text = Html.fromHtml(tieuDe)
         var customHtml = ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
                 + "<html><head>"
                 + "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"  />"
@@ -165,7 +121,7 @@ class DetailActivity : BaseActivity() {
                 hexegram.h_wao3 + hexegram.h_wao4 +
                 hexegram.h_wao5 + hexegram.h_wao6 +
                 "<body><html>"
-        txvContent!!.text = Html.fromHtml(customHtml)
+        binding.txvGiaiXam.text = Html.fromHtml(customHtml)
 
         //Load quảng cáo mỗi khi tắt
         if (ad != null) {
@@ -182,7 +138,7 @@ class DetailActivity : BaseActivity() {
     }
 
     private fun clickBtnBack() {
-        imgBack!!.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             val intent = Intent(this@DetailActivity, MainMenuActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -192,7 +148,7 @@ class DetailActivity : BaseActivity() {
 
     //button share
     fun setBtnShare() {
-        btnShare!!.setOnClickListener {
+        binding.btnShareDL.setOnClickListener {
             val sharingIntent = Intent(Intent.ACTION_SEND)
             sharingIntent.type = "text/plain"
             val shareBody = "https://sites.google.com/view/boidich-policy/loi-tua"
@@ -205,58 +161,58 @@ class DetailActivity : BaseActivity() {
     // setImageLine on Top
     fun setLineHexegram(h1: String, h2: String, h3: String, h4: String, h5: String, h6: String) {
         if (h1 == "dynamic_1") {
-            hao1!!.setImageResource(R.mipmap.line_dynamic_1)
+            binding.imgH1.setImageResource(R.mipmap.line_dynamic_1)
         } else if (h1 == "normal_1") {
-            hao1!!.setImageResource(R.mipmap.line_normal_1)
+            binding.imgH1.setImageResource(R.mipmap.line_normal_1)
         } else if (h1 == "dynamic_0") {
-            hao1!!.setImageResource(R.mipmap.line_dynamic_0)
+            binding.imgH1.setImageResource(R.mipmap.line_dynamic_0)
         } else {
-            hao1!!.setImageResource(R.mipmap.line_normal_0)
+            binding.imgH1.setImageResource(R.mipmap.line_normal_0)
         }
         if (h2 == "dynamic_1") {
-            hao2!!.setImageResource(R.mipmap.line_dynamic_1)
+            binding.imgH2.setImageResource(R.mipmap.line_dynamic_1)
         } else if (h2 == "normal_1") {
-            hao2!!.setImageResource(R.mipmap.line_normal_1)
+            binding.imgH2.setImageResource(R.mipmap.line_normal_1)
         } else if (h2 == "dynamic_0") {
-            hao2!!.setImageResource(R.mipmap.line_dynamic_0)
+            binding.imgH2.setImageResource(R.mipmap.line_dynamic_0)
         } else {
-            hao2!!.setImageResource(R.mipmap.line_normal_0)
+            binding.imgH2.setImageResource(R.mipmap.line_normal_0)
         }
         if (h3 == "dynamic_1") {
-            hao3!!.setImageResource(R.mipmap.line_dynamic_1)
+            binding.imgH3.setImageResource(R.mipmap.line_dynamic_1)
         } else if (h3 == "normal_1") {
-            hao3!!.setImageResource(R.mipmap.line_normal_1)
+            binding.imgH3.setImageResource(R.mipmap.line_normal_1)
         } else if (h3 == "dynamic_0") {
-            hao3!!.setImageResource(R.mipmap.line_dynamic_0)
+            binding.imgH3.setImageResource(R.mipmap.line_dynamic_0)
         } else {
-            hao3!!.setImageResource(R.mipmap.line_normal_0)
+            binding.imgH3.setImageResource(R.mipmap.line_normal_0)
         }
         if (h4 == "dynamic_1") {
-            hao4!!.setImageResource(R.mipmap.line_dynamic_1)
+            binding.imgH4.setImageResource(R.mipmap.line_dynamic_1)
         } else if (h4 == "normal_1") {
-            hao4!!.setImageResource(R.mipmap.line_normal_1)
+            binding.imgH4.setImageResource(R.mipmap.line_normal_1)
         } else if (h4 == "dynamic_0") {
-            hao4!!.setImageResource(R.mipmap.line_dynamic_0)
+            binding.imgH4.setImageResource(R.mipmap.line_dynamic_0)
         } else {
-            hao4!!.setImageResource(R.mipmap.line_normal_0)
+            binding.imgH4.setImageResource(R.mipmap.line_normal_0)
         }
         if (h5 == "dynamic_1") {
-            hao5!!.setImageResource(R.mipmap.line_dynamic_1)
+            binding.imgH5.setImageResource(R.mipmap.line_dynamic_1)
         } else if (h5 == "normal_1") {
-            hao5!!.setImageResource(R.mipmap.line_normal_1)
+            binding.imgH5.setImageResource(R.mipmap.line_normal_1)
         } else if (h5 == "dynamic_0") {
-            hao5!!.setImageResource(R.mipmap.line_dynamic_0)
+            binding.imgH5.setImageResource(R.mipmap.line_dynamic_0)
         } else {
-            hao5!!.setImageResource(R.mipmap.line_normal_0)
+            binding.imgH5.setImageResource(R.mipmap.line_normal_0)
         }
         if (h6 == "dynamic_1") {
-            hao6!!.setImageResource(R.mipmap.line_dynamic_1)
+            binding.imgH6.setImageResource(R.mipmap.line_dynamic_1)
         } else if (h6 == "normal_1") {
-            hao6!!.setImageResource(R.mipmap.line_normal_1)
+            binding.imgH6.setImageResource(R.mipmap.line_normal_1)
         } else if (h6 == "dynamic_0") {
-            hao6!!.setImageResource(R.mipmap.line_dynamic_0)
+            binding.imgH6.setImageResource(R.mipmap.line_dynamic_0)
         } else {
-            hao6!!.setImageResource(R.mipmap.line_normal_0)
+            binding.imgH6.setImageResource(R.mipmap.line_normal_0)
         }
     }
 
@@ -310,43 +266,23 @@ class DetailActivity : BaseActivity() {
         }
     }
 
-    @Throws(JSONException::class)
-    private fun readBanner(response: String): List<String>? {
-        var array: MutableList<String>? = null
-        val jsonObject = JSONObject(response)
-        val payload = jsonObject.optJSONArray("payload")
-        for (i in 0 until payload.length()) {
-            val info = payload.opt(i) as JSONObject
-            if (info != null) {
-                val link = info.optString("link")
-                val phto_link = info.optString("photo_link")
-                val idAds = info.optString("id")
-                array = ArrayList()
-                array.add(link)
-                array.add(phto_link)
-                array.add(idAds)
-            }
-        }
-        return array
-    }
-
     private fun clickCloseAds() {
-        btnClose!!.setOnClickListener {
-            bgBanner!!.visibility = View.GONE
-            imgBanner!!.visibility = View.GONE
-            btnClose!!.visibility = View.GONE
-            imgBack!!.isEnabled = true
-            btnShare!!.isEnabled = true
+        binding.btnClose.setOnClickListener {
+            binding.bgBanner.visibility = View.GONE
+            binding.imgAds.visibility = View.GONE
+            binding.btnClose.visibility = View.GONE
+            binding.btnBack.isEnabled = true
+            binding.btnShareDL.isEnabled = true
         }
     }
 
     private fun clickAdsBanner(link: String, idAds: String) {
-        imgBanner!!.setOnClickListener {
-            bgBanner!!.visibility = View.GONE
-            imgBanner!!.visibility = View.GONE
-            btnClose!!.visibility = View.GONE
-            imgBack!!.isEnabled = true
-            btnShare!!.isEnabled = true
+        binding.imgAds.setOnClickListener {
+            binding.bgBanner.visibility = View.GONE
+            binding.imgAds.visibility = View.GONE
+            binding.btnClose.visibility = View.GONE
+            binding.btnBack.isEnabled = true
+            binding.btnShareDL.isEnabled = true
             //request api
             detailViewModel.clickAds(idAds)
             val intent = Intent()
@@ -374,31 +310,25 @@ class DetailActivity : BaseActivity() {
         finish()
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
     private fun scrollToBottom() {
         if (CheckInternet.isConnected(this)) {
-            svContent!!.onBottomReachedListener = object : OnBottomReachedListener {
+            binding.svContent.onBottomReachedListener = object : OnBottomReachedListener {
                 override fun onBottomReached() {
                     val link = infoAds!![0].link
                     val photoLink = infoAds!![0].photo_link
                     val idAds = infoAds!![0].id
-                    if (link != null && photoLink != null) {
-                        bgBanner!!.visibility = View.VISIBLE
-                        imgBanner!!.visibility = View.VISIBLE
-                        btnClose!!.visibility = View.VISIBLE
-                        imgBack!!.isEnabled = false
-                        btnShare!!.isEnabled = false
-                        imageLoader = ApplicationController.getInstance(this@DetailActivity)?.imageLoader
-                        imageLoader?.get(photoLink, ImageLoader.getImageListener(imgBanner, 0, 0))
-                        imgBanner!!.setImageUrl("url", imageLoader)
-                        // click vào quảng cáo
-                        clickAdsBanner(link, idAds.toString())
-                        // click vào btnclose
-                        clickCloseAds()
-                    }
+                    binding.bgBanner.visibility = View.VISIBLE
+                    binding.imgAds.visibility = View.VISIBLE
+                    binding.btnClose.visibility = View.VISIBLE
+                    binding.btnBack.isEnabled = false
+                    binding.btnShareDL.isEnabled = false
+
+                    Glide.with(applicationContext).load(photoLink).into(binding.imgAds)
+
+                    // click vào quảng cáo
+                    clickAdsBanner(link, idAds.toString())
+                    // click vào btnclose
+                    clickCloseAds()
                 }
             }
         }

@@ -9,26 +9,17 @@ import android.media.RingtoneManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.android.volley.AuthFailureError
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.cannshine.fortune.API
 import com.cannshine.fortune.AppApplication
 import com.cannshine.fortune.splash.SplashActivity
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.R
-import com.cannshine.fortune.VolleyRequest.ApplicationController
 import com.cannshine.fortune.model.UpdateFCM
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import org.json.JSONException
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
-import java.util.*
 
 class MyFirebaseService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -54,7 +45,9 @@ class MyFirebaseService : FirebaseMessagingService() {
         val deviceId = Utils.getDeviceId(this@MyFirebaseService)
         val sharedPreferences = getSharedPreferences(Global.KEY_USER, MODE_PRIVATE)
         val userKey = sharedPreferences.getString(Global.K_USERKEY, "")
-        if (userKey == "" == false) updateFCM(deviceId, userKey, s)
+        if (deviceId != null && userKey != null){
+            if (userKey == "" == false) updateFCM(deviceId, userKey, s)
+        }
     }
 
     private fun sendNotification(remoteMessage: RemoteMessage) {
@@ -86,13 +79,9 @@ class MyFirebaseService : FirebaseMessagingService() {
         return false
     }
 
-    fun updateFCM(deviceId: String?, userKey: String?, token: String) {
+    fun updateFCM(deviceId: String, userKey: String, token: String) {
         val request = API.buildService(API.AppRepository::class.java)
-        val act = RequestBody.create("text/plain".toMediaTypeOrNull(), "updatefcm")
-        val userkey = RequestBody.create("text/plain".toMediaTypeOrNull(), "$userKey")
-        val deviceid = RequestBody.create("text/plain".toMediaTypeOrNull(), "$deviceId")
-        val fcm = RequestBody.create("text/plain".toMediaTypeOrNull(), "$token")
-        val call = request.updateFCM(act, userkey, deviceid, fcm)
+        val call = request.updateFCM("updatefcm", userKey, deviceId, token)
 
         call.enqueue(object : Callback<UpdateFCM> {
             override fun onResponse(call: Call<UpdateFCM>, response: retrofit2.Response<UpdateFCM>) {

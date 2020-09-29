@@ -3,10 +3,10 @@
 package com.cannshine.fortune.mainmenu
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Typeface
 import android.graphics.drawable.AnimationDrawable
 import android.media.MediaPlayer
 import android.net.Uri
@@ -18,62 +18,35 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Animation.AnimationListener
 import android.view.animation.TranslateAnimation
-import android.widget.ImageView
 import android.widget.RelativeLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.android.volley.AuthFailureError
-import com.android.volley.Response
-import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.NetworkImageView
-import com.android.volley.toolbox.StringRequest
+import com.bumptech.glide.Glide
 import com.cannshine.fortune.BuildConfig
 import com.cannshine.fortune.db.Database
 import com.cannshine.fortune.R
-import com.cannshine.fortune.VolleyRequest.ApplicationController
 import com.cannshine.fortune.base.BaseActivity
+import com.cannshine.fortune.databinding.ActivityMainMenuBinding
 import com.cannshine.fortune.model.AdsManager
 import com.cannshine.fortune.model.Hexegram
 import com.cannshine.fortune.utils.CheckInternet
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.detail.DetailActivity
-import com.cannshine.fortune.model.AppVersionInfo
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.google.gson.Gson
 import com.startapp.android.publish.adsCommon.StartAppAd
 import com.startapp.android.publish.adsCommon.StartAppSDK
-import org.json.JSONException
-import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MainMenuActivity : BaseActivity() {
-    var imgTortoise: ImageView? = null
-    var btnStart: ImageView? = null
-    var imgCoin1: ImageView? = null
-    var imgCoin2: ImageView? = null
-    var imgCoin3: ImageView? = null
-    var imgLine1: ImageView? = null
-    var imgLine2: ImageView? = null
-    var imgLine3: ImageView? = null
-    var imgLine4: ImageView? = null
-    var imgLine5: ImageView? = null
-    var imgLine6: ImageView? = null
-    var btnShare: ImageView? = null
-    var imgDisk: ImageView? = null
-    var btnSound: ImageView? = null
-    var txvCount: TextView? = null
-    var txvTitle: TextView? = null
-    var btnGieoQueNhanh: NetworkImageView? = null
-    var imageLoader: ImageLoader? = null
     var mediaShakeTortoise: MediaPlayer? = null
     var mediaUpCoin: MediaPlayer? = null
     var shakeT: AnimationDrawable? = null
@@ -103,6 +76,7 @@ class MainMenuActivity : BaseActivity() {
     var dataHexegram = Database(this)
     var arrayList = ArrayList<Int>()
     var broadcastReceiver: BroadcastReceiver? = null
+    lateinit var binding: ActivityMainMenuBinding
     override fun getContentView(): Int {
         return R.layout.activity_main_menu
     }
@@ -110,21 +84,20 @@ class MainMenuActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainMenuViewModel = ViewModelProviders.of(this).get(MainMenuViewModel::class.java)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main_menu)
         // Admob Banner
         if (CheckInternet.isConnected(this)) {
             val admobInfo = Utils.getAdsInfo(this, Global.KEY_ADMOB)
             val appId = admobInfo[Global.ADMOB_APP_ID]!!.trim { it <= ' ' }
             Log.d("admob", "onCreate: $appId")
-            if (appId != null) {
-                val relativeLayout = findViewById<RelativeLayout>(R.id.admobBanner)
-                val mAdView = AdView(this)
-                MobileAds.initialize(this, appId)
-                mAdView.adSize = AdSize.BANNER
-                mAdView.adUnitId = admobInfo[Global.ADMOB_BANNER_ID]
-                relativeLayout.addView(mAdView)
-                val adRequest = AdRequest.Builder().addTestDevice("B852C1784AC94383A068EC6C168A15F8").build()
-                mAdView.loadAd(adRequest)
-            }
+            val relativeLayout = findViewById<RelativeLayout>(R.id.admobBanner)
+            val mAdView = AdView(this)
+            MobileAds.initialize(this, appId)
+            mAdView.adSize = AdSize.BANNER
+            mAdView.adUnitId = admobInfo[Global.ADMOB_BANNER_ID]
+            relativeLayout.addView(mAdView)
+            val adRequest = AdRequest.Builder().addTestDevice("B852C1784AC94383A068EC6C168A15F8").build()
+            mAdView.loadAd(adRequest)
 
             //Quảng cáo StartApp
             val startappInfo = Utils.getAdsInfo(this, Global.KEY_STARTAPP)
@@ -157,37 +130,21 @@ class MainMenuActivity : BaseActivity() {
         }
         mediaShakeTortoise = MediaPlayer.create(this@MainMenuActivity, R.raw.sowhexagram)
         mediaUpCoin = MediaPlayer.create(this@MainMenuActivity, R.raw.coin)
-        btnStart = findViewById<View>(R.id.btn_done) as ImageView
-        btnSound = findViewById<View>(R.id.btn_sound) as ImageView
-        imgDisk = findViewById<View>(R.id.img_disk) as ImageView
-        imgTortoise = findViewById<View>(R.id.img_tortoise) as ImageView
-        imgCoin1 = findViewById<View>(R.id.img_coin1) as ImageView
-        imgCoin2 = findViewById<View>(R.id.img_coin2) as ImageView
-        imgCoin3 = findViewById<View>(R.id.img_coin3) as ImageView
-        imgLine1 = findViewById<View>(R.id.img_line1) as ImageView
-        imgLine2 = findViewById<View>(R.id.img_line2) as ImageView
-        imgLine3 = findViewById<View>(R.id.img_line3) as ImageView
-        imgLine4 = findViewById<View>(R.id.img_line4) as ImageView
-        imgLine5 = findViewById<View>(R.id.img_line5) as ImageView
-        imgLine6 = findViewById<View>(R.id.img_line6) as ImageView
-        btnShare = findViewById<View>(R.id.btn_share) as ImageView
-        txvCount = findViewById<View>(R.id.txv_count) as TextView
-        txvTitle = findViewById<View>(R.id.txv_title) as TextView
-        btnGieoQueNhanh = findViewById(R.id.btn_gieo_que_nhanh)
-        val fontTxv = Typeface.createFromAsset(this.assets, "UTM Azuki.ttf")
-        txvTitle!!.setTypeface(fontTxv)
-        txvCount!!.setTypeface(fontTxv)
+        val fontTxv = Utils.getFontType(this)
+        binding.txvTitle.setTypeface(fontTxv)
+        binding.txvCount.setTypeface(fontTxv)
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 showAlertMessage(intent.getStringExtra("body"), intent.getStringExtra("title"))
             }
         }
         setInvisibleCoin()
+        //todo: this
         if (Global.LINK != null && Global.PHOTO_LINK != null) {
             setBtnGieoQueNhanh(Global.PHOTO_LINK)
             clickBtnGieoQueNhanh(Global.LINK!!, Global.ID_ADS!!)
         } else {
-            btnGieoQueNhanh?.setVisibility(View.GONE)
+            binding.btnGieoQueNhanh.setVisibility(View.GONE)
         }
 
         // Kiểm tra xem đã có setting trước khi đó chưa
@@ -196,18 +153,18 @@ class MainMenuActivity : BaseActivity() {
         if (string_temp == "1" == false && string_temp == "0" == false) {
             setImageSound()
         } else if (string_temp == "1") {
-            btnSound!!.setImageResource(R.mipmap.btn_unmute)
+            binding.btnSound.setImageResource(R.drawable.btn_unmute)
             mediaUpCoin?.setVolume(1f, 1f)
             mediaShakeTortoise?.setVolume(1f, 1f)
         } else {
-            btnSound!!.setImageResource(R.mipmap.btn_mute)
+            binding.btnSound.setImageResource(R.drawable.btn_mute)
             mediaUpCoin?.setVolume(0f, 0f)
             mediaShakeTortoise?.setVolume(0f, 0f)
         }
 
         // sự kiện nhấn nút mute
         clickBtnSound()
-        btnStart!!.setOnClickListener {
+        binding.btnDone.setOnClickListener {
             val check = askPermission(REQUEST_ID_WRITE_PERMISSION,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)
             initAnimation()
@@ -215,9 +172,9 @@ class MainMenuActivity : BaseActivity() {
                 arrayList = arrayNumber()
                 count += 1
                 if (count <= 6) {
-                    imgTortoise!!.startAnimation(downTortoise)
+                    binding.imgTortoise.startAnimation(downTortoise)
                 } else if (count == 7) {
-                    imgTortoise!!.startAnimation(downTortoise)
+                    binding.imgTortoise.startAnimation(downTortoise)
                 } else if (count == 8) {
                     val intent = Intent(this@MainMenuActivity, DetailActivity::class.java)
                     intent.putExtra("key_1", idHexe)
@@ -237,52 +194,52 @@ class MainMenuActivity : BaseActivity() {
     }
 
     fun setInvisibleCoin() {
-        imgCoin1!!.visibility = View.INVISIBLE
-        imgCoin2!!.visibility = View.INVISIBLE
-        imgCoin3!!.visibility = View.INVISIBLE
+        binding.imgCoin1.visibility = View.INVISIBLE
+        binding.imgCoin2.visibility = View.INVISIBLE
+        binding.imgCoin3.visibility = View.INVISIBLE
     }
 
     fun setInvisibleCoin_UpCoin() {
-        imgCoin1!!.clearAnimation()
-        imgCoin2!!.clearAnimation()
-        imgCoin3!!.clearAnimation()
-        imgCoin1!!.visibility = View.INVISIBLE
-        imgCoin2!!.visibility = View.INVISIBLE
-        imgCoin3!!.visibility = View.INVISIBLE
+        binding.imgCoin1.clearAnimation()
+        binding.imgCoin2.clearAnimation()
+        binding.imgCoin3.clearAnimation()
+        binding.imgCoin1.visibility = View.INVISIBLE
+        binding.imgCoin2.visibility = View.INVISIBLE
+        binding.imgCoin3.visibility = View.INVISIBLE
     }
 
     fun setVisibleCoin() {
-        imgCoin1!!.visibility = View.VISIBLE
-        imgCoin2!!.visibility = View.VISIBLE
-        imgCoin3!!.visibility = View.VISIBLE
+        binding.imgCoin1.visibility = View.VISIBLE
+        binding.imgCoin2.visibility = View.VISIBLE
+        binding.imgCoin3.visibility = View.VISIBLE
     }
 
     fun setImageCoin() {
         if (arrayList[0] == 0) {
-            imgCoin1!!.setImageResource(R.mipmap.icon_coin_0)
+            binding.imgCoin1.setImageResource(R.drawable.icon_coin_0)
             if (arrayList[1] == 0) {
-                imgCoin2!!.setImageResource(R.mipmap.icon_coin_0)
+                binding.imgCoin2.setImageResource(R.drawable.icon_coin_0)
                 if (arrayList[2] == 0) {
-                    imgCoin3!!.setImageResource(R.mipmap.icon_coin_0)
-                } else imgCoin3!!.setImageResource(R.mipmap.icon_coin_1)
+                    binding.imgCoin3.setImageResource(R.drawable.icon_coin_0)
+                } else binding.imgCoin3.setImageResource(R.drawable.icon_coin_1)
             } else {
-                imgCoin2!!.setImageResource(R.mipmap.icon_coin_1)
+                binding.imgCoin2.setImageResource(R.drawable.icon_coin_1)
                 if (arrayList[2] == 0) {
-                    imgCoin3!!.setImageResource(R.mipmap.icon_coin_0)
-                } else imgCoin3!!.setImageResource(R.mipmap.icon_coin_1)
+                    binding.imgCoin3.setImageResource(R.drawable.icon_coin_0)
+                } else binding.imgCoin3.setImageResource(R.drawable.icon_coin_1)
             }
         } else {
-            imgCoin1!!.setImageResource(R.mipmap.icon_coin_1)
+            binding.imgCoin1.setImageResource(R.drawable.icon_coin_1)
             if (arrayList[1] == 0) {
-                imgCoin2!!.setImageResource(R.mipmap.icon_coin_0)
+                binding.imgCoin2.setImageResource(R.drawable.icon_coin_0)
                 if (arrayList[2] == 0) {
-                    imgCoin3!!.setImageResource(R.mipmap.icon_coin_0)
-                } else imgCoin3!!.setImageResource(R.mipmap.icon_coin_1)
+                    binding.imgCoin3.setImageResource(R.drawable.icon_coin_0)
+                } else binding.imgCoin3.setImageResource(R.drawable.icon_coin_1)
             } else {
-                imgCoin2!!.setImageResource(R.mipmap.icon_coin_1)
+                binding.imgCoin2.setImageResource(R.drawable.icon_coin_1)
                 if (arrayList[2] == 0) {
-                    imgCoin3!!.setImageResource(R.mipmap.icon_coin_0)
-                } else imgCoin3!!.setImageResource(R.mipmap.icon_coin_1)
+                    binding.imgCoin3.setImageResource(R.drawable.icon_coin_0)
+                } else binding.imgCoin3.setImageResource(R.drawable.icon_coin_1)
             }
         }
     }
@@ -329,108 +286,108 @@ class MainMenuActivity : BaseActivity() {
         if (line == 1) {
             h1 = if (isDynamic == true) {
                 if (type == yang) {
-                    imgLine1!!.setImageResource(R.mipmap.line_dynamic_1)
+                    binding.imgLine1.setImageResource(R.mipmap.line_dynamic_1)
                     "dynamic_1"
                 } else {
-                    imgLine1!!.setImageResource(R.mipmap.line_dynamic_0)
+                    binding.imgLine1.setImageResource(R.mipmap.line_dynamic_0)
                     "dynamic_0"
                 }
             } else {
                 if (type == yang) {
-                    imgLine1!!.setImageResource(R.mipmap.line_normal_1)
+                    binding.imgLine1.setImageResource(R.mipmap.line_normal_1)
                     "normal_1"
                 } else {
-                    imgLine1!!.setImageResource(R.mipmap.line_normal_0)
+                    binding.imgLine1.setImageResource(R.mipmap.line_normal_0)
                     "normal_0"
                 }
             }
         } else if (line == 2) {
             h2 = if (isDynamic == true) {
                 if (type == yang) {
-                    imgLine2!!.setImageResource(R.mipmap.line_dynamic_1)
+                    binding.imgLine2.setImageResource(R.mipmap.line_dynamic_1)
                     "dynamic_1"
                 } else {
-                    imgLine2!!.setImageResource(R.mipmap.line_dynamic_0)
+                    binding.imgLine2.setImageResource(R.mipmap.line_dynamic_0)
                     "dynamic_0"
                 }
             } else {
                 if (type == yang) {
-                    imgLine2!!.setImageResource(R.mipmap.line_normal_1)
+                    binding.imgLine2.setImageResource(R.mipmap.line_normal_1)
                     "normal_1"
                 } else {
-                    imgLine2!!.setImageResource(R.mipmap.line_normal_0)
+                    binding.imgLine2.setImageResource(R.mipmap.line_normal_0)
                     "normal_0"
                 }
             }
         } else if (line == 3) {
             h3 = if (isDynamic == true) {
                 if (type == yang) {
-                    imgLine3!!.setImageResource(R.mipmap.line_dynamic_1)
+                    binding.imgLine3.setImageResource(R.mipmap.line_dynamic_1)
                     "dynamic_1"
                 } else {
-                    imgLine3!!.setImageResource(R.mipmap.line_dynamic_0)
+                    binding.imgLine3.setImageResource(R.mipmap.line_dynamic_0)
                     "dynamic_0"
                 }
             } else {
                 if (type == yang) {
-                    imgLine3!!.setImageResource(R.mipmap.line_normal_1)
+                    binding.imgLine3.setImageResource(R.mipmap.line_normal_1)
                     "normal_1"
                 } else {
-                    imgLine3!!.setImageResource(R.mipmap.line_normal_0)
+                    binding.imgLine3.setImageResource(R.mipmap.line_normal_0)
                     "normal_0"
                 }
             }
         } else if (line == 4) {
             h4 = if (isDynamic == true) {
                 if (type == yang) {
-                    imgLine4!!.setImageResource(R.mipmap.line_dynamic_1)
+                    binding.imgLine4.setImageResource(R.mipmap.line_dynamic_1)
                     "dynamic_1"
                 } else {
-                    imgLine4!!.setImageResource(R.mipmap.line_dynamic_0)
+                    binding.imgLine4.setImageResource(R.mipmap.line_dynamic_0)
                     "dynamic_0"
                 }
             } else {
                 if (type == yang) {
-                    imgLine4!!.setImageResource(R.mipmap.line_normal_1)
+                    binding.imgLine4.setImageResource(R.mipmap.line_normal_1)
                     "normal_1"
                 } else {
-                    imgLine4!!.setImageResource(R.mipmap.line_normal_0)
+                    binding.imgLine4.setImageResource(R.mipmap.line_normal_0)
                     "normal_0"
                 }
             }
         } else if (line == 5) {
             h5 = if (isDynamic == true) {
                 if (type == yang) {
-                    imgLine5!!.setImageResource(R.mipmap.line_dynamic_1)
+                    binding.imgLine5.setImageResource(R.mipmap.line_dynamic_1)
                     "dynamic_1"
                 } else {
-                    imgLine5!!.setImageResource(R.mipmap.line_dynamic_0)
+                    binding.imgLine5.setImageResource(R.mipmap.line_dynamic_0)
                     "dynamic_0"
                 }
             } else {
                 if (type == yang) {
-                    imgLine5!!.setImageResource(R.mipmap.line_normal_1)
+                    binding.imgLine5.setImageResource(R.mipmap.line_normal_1)
                     "normal_1"
                 } else {
-                    imgLine5!!.setImageResource(R.mipmap.line_normal_0)
+                    binding.imgLine5.setImageResource(R.mipmap.line_normal_0)
                     "normal_0"
                 }
             }
         } else {
             h6 = if (isDynamic == true) {
                 if (type == yang) {
-                    imgLine6!!.setImageResource(R.mipmap.line_dynamic_1)
+                    binding.imgLine6.setImageResource(R.mipmap.line_dynamic_1)
                     "dynamic_1"
                 } else {
-                    imgLine6!!.setImageResource(R.mipmap.line_dynamic_0)
+                    binding.imgLine6.setImageResource(R.mipmap.line_dynamic_0)
                     "dynamic_0"
                 }
             } else {
                 if (type == yang) {
-                    imgLine6!!.setImageResource(R.mipmap.line_normal_1)
+                    binding.imgLine6.setImageResource(R.mipmap.line_normal_1)
                     "normal_1"
                 } else {
-                    imgLine6!!.setImageResource(R.mipmap.line_normal_0)
+                    binding.imgLine6.setImageResource(R.mipmap.line_normal_0)
                     "normal_0"
                 }
             }
@@ -459,8 +416,8 @@ class MainMenuActivity : BaseActivity() {
         }
         data = dataHexegram.getValues(idHexe)!!
         val name = data.h_name
-        txvTitle!!.textSize = 15f
-        txvTitle!!.text = name
+        binding.txvTitle.textSize = 15f
+        binding.txvTitle.text = name
     }
 
     //dao nguoc chuoi
@@ -469,7 +426,7 @@ class MainMenuActivity : BaseActivity() {
     }
 
     fun buttomShare() {
-        btnShare!!.setOnClickListener {
+        binding.btnShare.setOnClickListener {
             val sharingIntent = Intent(Intent.ACTION_SEND)
             sharingIntent.type = "text/plain"
             val shareBody = "https://sites.google.com/view/boidich-policy/loi-tua"
@@ -482,13 +439,13 @@ class MainMenuActivity : BaseActivity() {
     private fun askPermissionAndWrite() {
         val canWrite = askPermission(REQUEST_ID_WRITE_PERMISSION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        //
         if (canWrite) {
             createDB()
         }
     }
 
     // Với Android Level >= 23 bạn phải hỏi người dùng cho phép các quyền với thiết bị
+    @Suppress("SameParameterValue")
     private fun askPermission(requestId: Int, permissionName: String): Boolean {
         if (Build.VERSION.SDK_INT >= 23) {
 
@@ -517,7 +474,6 @@ class MainMenuActivity : BaseActivity() {
                     }
                 }
             }
-        } else {
         }
     }
 
@@ -577,42 +533,39 @@ class MainMenuActivity : BaseActivity() {
         downTortoise?.setDuration(1000)
         downTortoise?.setAnimationListener(object : AnimationListener {
             override fun onAnimationStart(animation: Animation) {
-                btnStart!!.isEnabled = false
+                binding.btnDone.isEnabled = false
             }
 
             override fun onAnimationEnd(animation: Animation) {
-                imgTortoise!!.setImageResource(R.drawable.shaketortoise)
-                shakeT = imgTortoise!!.drawable as AnimationDrawable
+                binding.imgTortoise.setImageResource(R.drawable.shaketortoise)
+                shakeT = binding.imgTortoise.drawable as AnimationDrawable
                 shakeT!!.start()
                 mediaShakeTortoise!!.start()
                 //                mediaShakeTortoise.prepareAsync();
                 myCountDownTimer = object : CountDownTimer(2000, 1000) {
                     override fun onTick(l: Long) {}
+                    @SuppressLint("SetTextI18n")
                     override fun onFinish() {
                         shakeT!!.stop()
                         mediaShakeTortoise!!.stop()
-                        try {
-                            mediaShakeTortoise!!.prepare()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
+                        mediaShakeTortoise!!.prepare()
                         setImageCoin()
                         setVisibleCoin()
-                        imgCoin1!!.startAnimation(upCoin1)
-                        imgCoin2!!.startAnimation(upCoin2)
-                        imgCoin3!!.startAnimation(upCoin3)
+                        binding.imgCoin1.startAnimation(upCoin1)
+                        binding.imgCoin2.startAnimation(upCoin2)
+                        binding.imgCoin3.startAnimation(upCoin3)
                         temp = Integer.toString(count)
                         if (count <= 6) {
-                            txvCount!!.text = "Hào $temp"
+                            binding.txvCount.text = "Hào $temp"
                         }
                         if (count == 7) {
-                            txvCount!!.text = ""
-                            btnStart!!.setImageResource(R.mipmap.button_show)
+                            binding.txvCount.text = ""
+                            binding.btnDone.setImageResource(R.drawable.button_show)
                         }
                         myCountDownTimer2 = object : CountDownTimer(3000, 1000) {
                             override fun onTick(l: Long) {}
                             override fun onFinish() {
-                                imgTortoise!!.startAnimation(upTortoise)
+                                binding.imgTortoise.startAnimation(upTortoise)
                             }
                         }
                         myCountDownTimer2?.start()
@@ -633,7 +586,7 @@ class MainMenuActivity : BaseActivity() {
             override fun onAnimationStart(animation: Animation) {}
             override fun onAnimationEnd(animation: Animation) {
                 setInvisibleCoin_UpCoin()
-                btnStart!!.isEnabled = true
+                binding.btnDone.isEnabled = true
             }
 
             override fun onAnimationRepeat(animation: Animation) {}
@@ -703,16 +656,16 @@ class MainMenuActivity : BaseActivity() {
 
         // lấy tọa độ y của imgDisk
         val location = IntArray(2)
-        imgDisk!!.getLocationOnScreen(location)
+        binding.imgDisk.getLocationOnScreen(location)
         val yImgDisk = location[1]
 
         // Lấy tọa độ y của BtnStart
         val location2 = IntArray(2)
-        btnStart!!.getLocationOnScreen(location2)
+        binding.btnDone.getLocationOnScreen(location2)
         val yBtnStart = location2[1]
-        val heightDisk = imgDisk!!.height
-        val widthDisk = imgDisk!!.width
-        val heightCoin = imgCoin1!!.height
+        val heightDisk = binding.imgDisk.height
+        val widthDisk = binding.imgDisk.width
+        val heightCoin = binding.imgCoin1.height
 
         // Lấy tọa độ y của ImgCoin
         val yImgCoin = yBtnStart - heightCoin
@@ -731,7 +684,7 @@ class MainMenuActivity : BaseActivity() {
 
     // click Button Sound
     fun clickBtnSound() {
-        btnSound!!.setOnClickListener {
+        binding.btnSound.setOnClickListener {
             val share = getSharedPreferences(SOUND_INFO, MODE_PRIVATE)
             val string_temp = share.getString(KEY_SOUND, "")
             if (string_temp == "1") {
@@ -742,18 +695,18 @@ class MainMenuActivity : BaseActivity() {
                 pref = getSharedPreferences(SOUND_INFO, MODE_PRIVATE)
                 val editor = pref.edit()
                 editor.putString(KEY_SOUND, "" + sound)
-                editor.commit()
-                btnSound!!.setImageResource(R.mipmap.btn_mute)
+                editor.apply()
+                binding.btnSound.setImageResource(R.drawable.btn_mute)
             } else if (string_temp == "0") {
                 sound = 1
                 mediaShakeTortoise!!.setVolume(1f, 1f)
                 mediaUpCoin!!.setVolume(1f, 1f)
-                btnSound!!.setImageResource(R.mipmap.btn_unmute)
+                binding.btnSound.setImageResource(R.drawable.btn_unmute)
                 val pref: SharedPreferences
                 pref = getSharedPreferences(SOUND_INFO, MODE_PRIVATE)
                 val editor = pref.edit()
                 editor.putString(KEY_SOUND, "" + sound)
-                editor.commit()
+                editor.apply()
             }
         }
     }
@@ -764,16 +717,12 @@ class MainMenuActivity : BaseActivity() {
         pref = getSharedPreferences(SOUND_INFO, MODE_PRIVATE)
         val editor = pref.edit()
         editor.putString(KEY_SOUND, "" + sound)
-        editor.commit()
-        btnSound!!.setImageResource(R.mipmap.btn_unmute)
+        editor.apply()
+        binding.btnSound.setImageResource(R.drawable.btn_unmute)
     }
 
     @Throws(PackageManager.NameNotFoundException::class)
     private fun showAlertUpdate(versionName: String, link: String, update: String) {
-        val manager = this.packageManager
-        val info = manager.getPackageInfo(
-                this.packageName, 0)
-        val version = info.versionName
         val builder = AlertDialog.Builder(this)
         builder.setCancelable(false)
         builder.setMessage("Ứng dụng đang có phiên bản $versionName. Vui lòng cập nhật!")
@@ -816,14 +765,16 @@ class MainMenuActivity : BaseActivity() {
 
     private fun setBtnGieoQueNhanh(photoLink: String?) {
         if (photoLink != null) {
-            imageLoader = ApplicationController.getInstance(this)?.imageLoader
-            imageLoader?.get(photoLink, ImageLoader.getImageListener(btnGieoQueNhanh, 0, 0))
-            btnGieoQueNhanh!!.setImageUrl("url", imageLoader)
+//            imageLoader = ApplicationController.getInstance(this)?.imageLoader
+//            imageLoader?.get(photoLink, ImageLoader.getImageListener(btnGieoQueNhanh, 0, 0))
+//            btnGieoQueNhanh!!.setImageUrl("url", imageLoader)
+            Glide.with(applicationContext).load(photoLink).into(binding.btnGieoQueNhanh)
+
         }
     }
 
     private fun clickBtnGieoQueNhanh(url: String, idAds: String) {
-        btnGieoQueNhanh!!.setOnClickListener {
+        binding.btnGieoQueNhanh.setOnClickListener {
             Log.d("idAds", "idAds $idAds")
             mainMenuViewModel.clickAds(idAds)
             val intent = Intent()

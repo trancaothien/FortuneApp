@@ -32,12 +32,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun clickAds(id: String) {
-        val act = RequestBody.create("text/plain".toMediaTypeOrNull(), "clickads")
-        val bannerid = RequestBody.create("text/plain".toMediaTypeOrNull(), "$id")
-        val appid = RequestBody.create("text/plain".toMediaTypeOrNull(), "1")
-        val os = RequestBody.create("text/plain".toMediaTypeOrNull(), "android")
         val request = API.buildService(API.AppRepository::class.java)
-        val call = request.clickAds(act, bannerid, appid, os)
+        val call = request.clickAds("clickads", id, 1, "android")
         call.enqueue(object : retrofit2.Callback<ClickAds> {
             override fun onResponse(call: Call<ClickAds>, response: retrofit2.Response<ClickAds>) {
                 val clickAds = response.body()

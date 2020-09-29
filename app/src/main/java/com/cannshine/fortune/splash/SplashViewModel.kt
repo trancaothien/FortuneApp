@@ -24,7 +24,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             override fun onFailure(call: Call<Status>, t: Throwable) {
-                Log.d("retrofitError", "onFailure: " + t.toString())
+                Log.d("retrofitError", "onFailure: $t")
                 fail()
             }
         })
@@ -41,7 +41,7 @@ class SplashViewModel(application: Application) : AndroidViewModel(application) 
                         for (bannerAds in arrayBannerAds) {
                             val link = bannerAds.link
                             val photoLink = bannerAds.photo_link
-                            Log.d("linkPhoto", "onCreate: " + link)
+                            Log.d("linkPhoto", "onCreate: $link")
                             val idAds = bannerAds.id
                             Global.LINK = link
                             Global.PHOTO_LINK = photoLink

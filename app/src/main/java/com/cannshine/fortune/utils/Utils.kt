@@ -1,6 +1,8 @@
 package com.cannshine.fortune.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Typeface
 import android.provider.Settings
 import android.util.Log
 
@@ -12,7 +14,7 @@ class Utils {
             val editor = sharedPreferences.edit()
             editor.putString(Global.K_USERID, userId)
             editor.putString(Global.K_USERKEY, userKey)
-            editor.commit()
+            editor.apply()
         }
 
         fun getUserInfo(context: Context, key: String?): Boolean {
@@ -30,14 +32,14 @@ class Utils {
             editor.putString(Global.ADMOB_APP_ID, appId)
             editor.putString(Global.ADMOB_BANNER_ID, bannerId)
             editor.putString(Global.ADMOB_INTERSTITIAL_ID, interstitialId)
-            editor.commit()
+            editor.apply()
         }
 
         fun startappSaveKey(context: Context, adsKey: String?, appId: String?, devId: String?) {
             val editor = context.getSharedPreferences(adsKey, Context.MODE_PRIVATE).edit()
             editor.putString(Global.STARTAPP_APP_ID, appId)
             editor.putString(Global.STARTAPP_DEV_ID, devId)
-            editor.commit()
+            editor.apply()
         }
 
         fun getAdsInfo(context: Context, adsKey: String?): Map<String, String?> {
@@ -45,6 +47,7 @@ class Utils {
             return preferences.all as Map<String, String?>
         }
 
+        @SuppressLint("HardwareIds")
         fun getDeviceId(context: Context): String? {
             val m_androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
             val preferences = context.getSharedPreferences(Global.KEY_DEVICE, Context.MODE_PRIVATE)
@@ -52,7 +55,7 @@ class Utils {
             val deviceId = preferences.getString(Global.K_DEVICE_ID, "")
             return if (deviceId == "") {
                 editor.putString(Global.K_DEVICE_ID, m_androidId)
-                editor.commit()
+                editor.apply()
                 m_androidId
             } else {
                 deviceId
@@ -68,13 +71,13 @@ class Utils {
             Log.d("flagtoken", "setFlagToken: $value")
             val editor = context.getSharedPreferences(Global.FLAG_TOKEN, Context.MODE_PRIVATE).edit()
             editor.putString(Global.K_TOKEN, value)
-            editor.commit()
+            editor.apply()
         }
 
         fun saveNewToken(context: Context, token: String?) {
             val editor = context.getSharedPreferences(Global.FLAG_TOKEN, Context.MODE_PRIVATE).edit()
             editor.putString(Global.FCM, token)
-            editor.commit()
+            editor.apply()
         }
 
         fun getNewToken(context: Context): String? {
@@ -82,6 +85,10 @@ class Utils {
             val token = preferences.getString(Global.FCM, "")
             Log.d("newtoken", "getNewToken: $token")
             return token
+        }
+
+        fun getFontType(context: Context): Typeface{
+            return Typeface.createFromAsset(context.assets, "UTM Azuki.ttf")
         }
     }
 }
