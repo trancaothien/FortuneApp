@@ -10,6 +10,12 @@ import com.cannshine.fortune.AppApplication
 import com.cannshine.fortune.model.*
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import retrofit2.Call
 import retrofit2.Callback
 import java.util.*
@@ -165,6 +171,17 @@ class MainMenuViewModel(application: Application) : AndroidViewModel(application
         } else {
             1
         }
+    }
+
+    fun getTitleHexagram(success: (Hexagram) -> Unit,idHexagram: String){
+        val databaseReference = Firebase.database.reference.child("hexagram").child(idHexagram)
+        databaseReference.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                success(snapshot.getValue(Hexagram::class.java)!!)
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 
 }

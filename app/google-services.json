@@ -1,43 +1,35 @@
 {
   "project_info": {
-    "project_number": "851100660739",
-    "firebase_url": "https://app-boi-dich.firebaseio.com",
-    "project_id": "app-boi-dich",
-    "storage_bucket": "app-boi-dich.appspot.com"
+    "project_number": "47069542047",
+    "firebase_url": "https://app-boi-dich-5af56.firebaseio.com",
+    "project_id": "app-boi-dich-5af56",
+    "storage_bucket": "app-boi-dich-5af56.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:851100660739:android:72515a10ec0278a0d08a36",
+        "mobilesdk_app_id": "1:47069542047:android:b8fafba39c017be11ed4aa",
         "android_client_info": {
           "package_name": "com.cannshine.fortune"
         }
       },
       "oauth_client": [
         {
-          "client_id": "851100660739-j3ksssbvcvv1tvt00mepiejh7gp9pv98.apps.googleusercontent.com",
+          "client_id": "47069542047-r82ulboq4cmpc3825b2mfv9dahdub5db.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDeMl3sjStZpZCmBfAwI7XJK8vBA2APQ2s"
+          "current_key": "AIzaSyAi-f8wfqXA9iILjNBJCyUNK1wjwTJ0c-A"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "851100660739-j3ksssbvcvv1tvt00mepiejh7gp9pv98.apps.googleusercontent.com",
+              "client_id": "47069542047-r82ulboq4cmpc3825b2mfv9dahdub5db.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "851100660739-ioacnmue2n5umprdsdn74kh7a8do8soq.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.cannshine.fortune",
-                "app_store_id": "910483222"
-              }
             }
           ]
         }

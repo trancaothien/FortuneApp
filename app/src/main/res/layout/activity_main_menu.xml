@@ -359,7 +359,8 @@
             android:layout_height="0dp"
             android:gravity="center"
             app:layout_constraintTop_toTopOf="@id/guideline12"
-            app:layout_constraintBottom_toBottomOf="parent"></RelativeLayout>
+            app:layout_constraintBottom_toBottomOf="parent">
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/imgTortoise"

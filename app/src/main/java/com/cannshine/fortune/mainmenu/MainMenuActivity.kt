@@ -31,11 +31,12 @@ import com.cannshine.fortune.R
 import com.cannshine.fortune.base.BaseActivity
 import com.cannshine.fortune.databinding.ActivityMainMenuBinding
 import com.cannshine.fortune.model.AdsManager
-import com.cannshine.fortune.model.Hexegram
 import com.cannshine.fortune.utils.CheckInternet
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.detail.DetailActivity
+import com.cannshine.fortune.firebase.GetValuesToFirebase
+import com.cannshine.fortune.model.Hexagram
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -72,7 +73,7 @@ class MainMenuActivity : BaseActivity() {
     var idHexe = ""
     var arrayLimitCoin = IntArray(6)
     var sound = 1
-    var data = Hexegram()
+    var data = Hexagram()
     var dataHexegram = Database(this)
     var arrayList = ArrayList<Int>()
     var broadcastReceiver: BroadcastReceiver? = null
@@ -81,6 +82,8 @@ class MainMenuActivity : BaseActivity() {
         return R.layout.activity_main_menu
     }
     lateinit var mainMenuViewModel: MainMenuViewModel
+    lateinit var getValuesToFirebase: GetValuesToFirebase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainMenuViewModel = ViewModelProviders.of(this).get(MainMenuViewModel::class.java)
@@ -122,6 +125,7 @@ class MainMenuActivity : BaseActivity() {
 
         // Hỏi cấp quyền Write
         askPermissionAndWrite()
+
         mainMenuViewModel.requestUser()
         mainMenuViewModel.getVersion {
             if (it?.version_check != null) {
@@ -413,10 +417,14 @@ class MainMenuActivity : BaseActivity() {
             }
             idHexe = idHexe + kyTu
         }
-        data = dataHexegram.getValues(idHexe)!!
-        val name = data.h_name
-        binding.txvTitle.textSize = 15f
-        binding.txvTitle.text = name
+        //data = dataHexegram.getValues(idHexe)!!
+        mainMenuViewModel.getTitleHexagram(success = {
+            data = it
+            val name = data.h_name
+            binding.txvTitle.textSize = 15f
+            binding.txvTitle.text = name
+        }, idHexe)
+
     }
 
     //dao nguoc chuoi
@@ -439,7 +447,12 @@ class MainMenuActivity : BaseActivity() {
         val canWrite = askPermission(REQUEST_ID_WRITE_PERMISSION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (canWrite) {
-            createDB()
+            mainMenuViewModel.getTitleHexagram(success = {
+                createDB()
+                // Lưu data vào realTimeDB
+                getValuesToFirebase = GetValuesToFirebase(dataHexegram)
+                getValuesToFirebase.writeHexagram()
+            }, "100100") // kiểm tra một id xem data đã được copy qua firebase chưa
         }
     }
 
@@ -469,7 +482,12 @@ class MainMenuActivity : BaseActivity() {
             when (requestCode) {
                 REQUEST_ID_WRITE_PERMISSION -> {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        createDB()
+                        mainMenuViewModel.getTitleHexagram(success = {
+                            createDB()
+                            // Lưu data vào realTimeDB
+                            getValuesToFirebase = GetValuesToFirebase(dataHexegram)
+                            getValuesToFirebase.writeHexagram()
+                        }, "100100")
                     }
                 }
             }

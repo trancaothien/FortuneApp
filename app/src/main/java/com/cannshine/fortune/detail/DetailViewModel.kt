@@ -5,7 +5,13 @@ import androidx.lifecycle.AndroidViewModel
 import com.cannshine.fortune.API
 import com.cannshine.fortune.model.BannerAds
 import com.cannshine.fortune.model.ClickAds
+import com.cannshine.fortune.model.Hexagram
 import com.cannshine.fortune.model.StatusBanner
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
@@ -43,6 +49,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             }
 
+        })
+    }
+
+    fun getContentHexagram(success: (Hexagram) -> Unit, idHexagram: String){
+        val databaseReference = Firebase.database.reference.child("hexagram").child(idHexagram)
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                success(snapshot.getValue(Hexagram::class.java)!!)
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
         })
     }
 }

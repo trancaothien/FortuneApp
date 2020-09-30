@@ -23,12 +23,12 @@ import com.cannshine.fortune.R
 import com.cannshine.fortune.base.BaseActivity
 import com.cannshine.fortune.mainmenu.MainMenuActivity
 import com.cannshine.fortune.model.AdsManager
-import com.cannshine.fortune.model.Hexegram
 import com.cannshine.fortune.utils.CheckInternet
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
 import com.cannshine.fortune.databinding.ActivityDetailBinding
 import com.cannshine.fortune.model.BannerAds
+import com.cannshine.fortune.model.Hexagram
 import com.google.android.gms.ads.*
 import com.startapp.android.publish.adsCommon.StartAppAd
 import java.util.*
@@ -38,7 +38,7 @@ import kotlin.collections.ArrayList
 class DetailActivity : BaseActivity() {
 //    var imageLoader: ImageLoader? = null
     var data = Database(this)
-    var hexegram = Hexegram()
+    var hexagram = Hexagram()
     private val startAppAd = StartAppAd(this)
     var ad = AdsManager.ad
     var infoAds: List<BannerAds>? = ArrayList()
@@ -102,26 +102,28 @@ class DetailActivity : BaseActivity() {
 
         //setLine
         setLineHexegram(h1, h2, h3, h4, h5, h6)
-        hexegram = data.getValues(idHexegram)!!
-        val title = hexegram.h_name
-        binding.txvTitleDl.textSize = 15f
-        binding.txvTitleDl.text = title
-        var tieuDe = ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-                + "<html><head>"
-                + "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"  />"
-                + "<head><body>")
-        tieuDe += hexegram.h_mean + "<body><html>"
-        binding.txvTieuDe.text = Html.fromHtml(tieuDe)
-        var customHtml = ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-                + "<html><head>"
-                + "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"  />"
-                + "<head><body>")
-        customHtml += hexegram.h_content +
-                hexegram.h_wao1 + hexegram.h_wao2 +
-                hexegram.h_wao3 + hexegram.h_wao4 +
-                hexegram.h_wao5 + hexegram.h_wao6 +
-                "<body><html>"
-        binding.txvGiaiXam.text = Html.fromHtml(customHtml)
+        detailViewModel.getContentHexagram(success = {
+            hexagram = it
+            val title = hexagram.h_name
+            binding.txvTitleDl.textSize = 15f
+            binding.txvTitleDl.text = title
+            var tieuDe = ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                    + "<html><head>"
+                    + "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"  />"
+                    + "<head><body>")
+            tieuDe += hexagram.h_mean + "<body><html>"
+            binding.txvTieuDe.text = Html.fromHtml(tieuDe)
+            var customHtml = ("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
+                    + "<html><head>"
+                    + "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"  />"
+                    + "<head><body>")
+            customHtml += hexagram.h_content +
+                    hexagram.h_wao1 + hexagram.h_wao2 +
+                    hexagram.h_wao3 + hexagram.h_wao4 +
+                    hexagram.h_wao5 + hexagram.h_wao6 +
+                    "<body><html>"
+            binding.txvGiaiXam.text = Html.fromHtml(customHtml)
+        }, idHexegram)
 
         //Load quảng cáo mỗi khi tắt
         if (ad != null) {
