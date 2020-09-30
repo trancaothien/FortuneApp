@@ -447,12 +447,13 @@ class MainMenuActivity : BaseActivity() {
         val canWrite = askPermission(REQUEST_ID_WRITE_PERMISSION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (canWrite) {
-            mainMenuViewModel.getTitleHexagram(success = {
+            mainMenuViewModel.getChildCountHexagram {
+            if (it != 64){ // 64 là số lượng xăm trong db
                 createDB()
                 // Lưu data vào realTimeDB
                 getValuesToFirebase = GetValuesToFirebase(dataHexegram)
-                getValuesToFirebase.writeHexagram()
-            }, "100100") // kiểm tra một id xem data đã được copy qua firebase chưa
+                getValuesToFirebase.writeHexagram() }
+            }
         }
     }
 
@@ -482,12 +483,14 @@ class MainMenuActivity : BaseActivity() {
             when (requestCode) {
                 REQUEST_ID_WRITE_PERMISSION -> {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        mainMenuViewModel.getTitleHexagram(success = {
-                            createDB()
-                            // Lưu data vào realTimeDB
-                            getValuesToFirebase = GetValuesToFirebase(dataHexegram)
-                            getValuesToFirebase.writeHexagram()
-                        }, "100100")
+                        mainMenuViewModel.getChildCountHexagram {
+                            if (it != 64){ // 64 là số lượng xăm trong db
+                                createDB()
+                                // Lưu data vào realTimeDB
+                                getValuesToFirebase = GetValuesToFirebase(dataHexegram)
+                                getValuesToFirebase.writeHexagram()
+                            }
+                        }
                     }
                 }
             }
