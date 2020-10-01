@@ -10,7 +10,6 @@ import com.cannshine.fortune.AppApplication
 import com.cannshine.fortune.model.*
 import com.cannshine.fortune.utils.Global
 import com.cannshine.fortune.utils.Utils
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -178,6 +177,19 @@ class MainMenuViewModel(application: Application) : AndroidViewModel(application
         databaseReference.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 success(snapshot.getValue(Hexagram::class.java)!!)
+            }
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    // Kiểm tra xem số lượng idHexagram đẵ đủ chưa
+    fun getChildCountHexagram(succes: (Int) -> Unit){
+        val databaseReference = Firebase.database.reference.child("hexagram")
+        databaseReference.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val countHexagram = snapshot.childrenCount.toInt()
+                succes(countHexagram)
             }
             override fun onCancelled(error: DatabaseError) {
             }
